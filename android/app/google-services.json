@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "380505063144",
+    "project_id": "keep-me-hydrated",
+    "storage_bucket": "keep-me-hydrated.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380505063144:android:bc24a6421b4f200ac4135d",
+        "android_client_info": {
+          "package_name": "com.example.plant_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxAHW0_Ep0ne29qpOjSovbuOOu_uja4BA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
