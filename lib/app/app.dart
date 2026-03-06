@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
-import '../features/plants/plants_screen.dart';
+import '../features/home/home_screen.dart';
 
 class PlantApp extends StatelessWidget {
   const PlantApp({super.key});
@@ -10,7 +10,7 @@ class PlantApp extends StatelessWidget {
     return MaterialApp(
       title: 'Plant Project',
       theme: AppTheme.lightTheme,
-      home: const PlantsScreen(),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
