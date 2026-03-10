@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
-import '../features/home/home_screen.dart';
+import '../features/auth/auth_gate.dart';
 
 class PlantApp extends StatelessWidget {
   const PlantApp({super.key});
@@ -10,7 +10,7 @@ class PlantApp extends StatelessWidget {
     return MaterialApp(
       title: 'Plant Project',
       theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
+      home: const AuthGate(),
       debugShowCheckedModeBanner: false,
     );
   }
