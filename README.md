@@ -20,7 +20,7 @@
 
 The app enables users to:
 
-- Set personalised daily hydration goals  
+- Set personalised daily hydration goals suited to preference
 - Log water consumption easily  
 - View visual progress towards their goal  
 - Receive scheduled reminder notifications  
