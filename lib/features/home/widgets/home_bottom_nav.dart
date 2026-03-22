@@ -16,11 +16,32 @@ class HomeBottomNav extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black54,
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.eco), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          activeIcon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.local_fire_department_outlined),
+          activeIcon: Icon(Icons.local_fire_department),
+          label: 'Streaks',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.notifications_none),
+          activeIcon: Icon(Icons.notifications),
+          label: 'Alerts',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          activeIcon: Icon(Icons.person),
+          label: 'Profile',
+        ),
       ],
     );
   }
