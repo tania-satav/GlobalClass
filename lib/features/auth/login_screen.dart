@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,6 +59,39 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      await GoogleSignIn.instance.initialize(
+        serverClientId:
+            '380505063144-jaguk6bs6kfbutgjc5kb9b2tq0buk0mh.apps.googleusercontent.com',
+      );
+
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance
+          .authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.message ?? 'Google sign in failed');
+      debugPrint('FirebaseAuthException: ${e.code} | ${e.message}');
+    } catch (e) {
+      setState(() => _error = e.toString());
+      debugPrint('Google sign in error: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,8 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 22),
-
-              // Card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -141,12 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-
               const Spacer(),
-
-              // Prototype buttons (UI only for now)
               OutlinedButton(
-                onPressed: () {},
+                onPressed: _isLoading ? null : _signInWithGoogle,
                 child: const Text('Continue with Google'),
               ),
               const SizedBox(height: 10),
@@ -154,7 +183,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {},
                 child: const Text('Continue with Apple'),
               ),
-
               const SizedBox(height: 10),
             ],
           ),

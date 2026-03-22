@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'widgets/intake_progress_card.dart';
 import 'widgets/did_you_know_card.dart';
@@ -8,12 +9,23 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Demo values (we’ll replace with real state later)
     const int goalMl = 1500;
     const int currentMl = 650;
 
     return Scaffold(
       backgroundColor: const Color(0xFFAEDFEA),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFAEDFEA),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: const [
