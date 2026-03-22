@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../streaks/streaks_screen.dart';
 import 'widgets/intake_progress_card.dart';
 import 'widgets/did_you_know_card.dart';
 import 'widgets/home_bottom_nav.dart';
@@ -42,7 +43,19 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: 0, onTap: (_) {}),
+      bottomNavigationBar: HomeBottomNav(
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 0) return;
+
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const StreaksScreen()),
+            );
+          }
+        },
+      ),
     );
   }
 }
