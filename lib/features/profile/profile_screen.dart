@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import 'account_screen.dart';
+import 'personalisation_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -80,7 +81,14 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.tune_outlined,
                 title: 'Personalisation',
                 subtitle: 'Weight, activity level, daily goal and units',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PersonalisationScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               _ProfileOptionCard(
