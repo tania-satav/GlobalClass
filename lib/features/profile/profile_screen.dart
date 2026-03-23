@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../home/home_screen.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import 'account_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -64,7 +66,14 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.manage_accounts_outlined,
                 title: 'Account',
                 subtitle: 'Login details, email, password reset and sign out',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AccountScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               _ProfileOptionCard(
@@ -89,6 +98,16 @@ class ProfileScreen extends StatelessWidget {
         currentIndex: 4,
         onTap: (index) {
           if (index == 4) return;
+
+          if (index == 0) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+            return;
+          }
+
           Navigator.pop(context);
         },
       ),
