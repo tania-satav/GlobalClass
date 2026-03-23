@@ -5,14 +5,45 @@ import 'widgets/intake_progress_card.dart';
 import 'widgets/did_you_know_card.dart';
 import 'widgets/home_bottom_nav.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const int goalMl = 1500;
-    const int currentMl = 650;
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  int goalMl = 1500; // later this can come from profile/settings/backend
+  int currentMl = 650;
+
+  void _addWater(int amount) {
+    setState(() {
+      currentMl += amount;
+
+      if (currentMl > goalMl) {
+        currentMl = goalMl;
+      }
+    });
+  }
+
+  void _removeWater(int amount) {
+    setState(() {
+      currentMl -= amount;
+
+      if (currentMl < 0) {
+        currentMl = 0;
+      }
+    });
+  }
+
+  void _resetWater() {
+    setState(() {
+      currentMl = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFAEDFEA),
       appBar: AppBar(
@@ -29,17 +60,94 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Column(
-          children: const [
-            SizedBox(height: 14),
-            _Title(),
-            SizedBox(height: 18),
+          children: [
+            const SizedBox(height: 14),
+            const _Title(),
+            const SizedBox(height: 18),
+
             IntakeProgressCard(goalMl: goalMl, currentMl: currentMl),
-            SizedBox(height: 18),
+
+            const SizedBox(height: 18),
+
             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _addWater(250),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF1D3557),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      '+250ml',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _addWater(500),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF1D3557),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      '+500ml',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _removeWater(250),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF1D3557),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      '-250ml',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _resetWater,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F45FF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 18),
               child: DidYouKnowCard(),
             ),
-            Spacer(),
+
+            const Spacer(),
           ],
         ),
       ),
