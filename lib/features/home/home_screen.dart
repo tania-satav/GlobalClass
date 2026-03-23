@@ -7,7 +7,14 @@ import 'widgets/did_you_know_card.dart';
 import 'widgets/home_bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.initialGoalMl = 1500,
+    this.initialCurrentMl = 650,
+  });
+
+  final int initialGoalMl;
+  final int initialCurrentMl;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,7 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    controller = WaterIntakeController();
+    controller = WaterIntakeController(
+      goalMl: widget.initialGoalMl,
+      currentMl: widget.initialCurrentMl,
+    );
   }
 
   @override
