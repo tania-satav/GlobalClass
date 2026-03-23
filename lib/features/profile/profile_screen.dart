@@ -3,6 +3,7 @@ import '../home/home_screen.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import 'account_screen.dart';
 import 'personalisation_screen.dart';
+import 'reminders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -95,7 +96,14 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.notifications_active_outlined,
                 title: 'Reminders',
                 subtitle: 'Notification frequency, timing and quiet hours',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RemindersScreen(),
+                    ),
+                  );
+                },
               ),
               const Spacer(),
             ],
