@@ -28,113 +28,117 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Container(
-                width: 110,
-                height: 110,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.manage_accounts,
-                  size: 58,
-                  color: Color(0xFF1D3557),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                displayName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Manage your login details and account settings',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _InfoCard(
-                title: 'Login Details',
-                children: [
-                  _InfoRow(
-                    icon: Icons.email_outlined,
-                    label: 'Email',
-                    value: email,
+        child: ScrollConfiguration(
+          behavior: const _NoStretchScrollBehavior(),
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                Container(
+                  width: 110,
+                  height: 110,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 14),
-                  _InfoRow(
-                    icon: Icons.login_outlined,
-                    label: 'Sign-in method',
-                    value: providerName,
+                  child: const Icon(
+                    Icons.manage_accounts,
+                    size: 58,
+                    color: Color(0xFF1D3557),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _ActionCard(
-                icon: Icons.lock_reset,
-                title: 'Reset Password',
-                subtitle: 'Send a password reset email to your account',
-                onTap: () async {
-                  final messenger = ScaffoldMessenger.of(context);
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  displayName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Manage your login details and account settings',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _InfoCard(
+                  title: 'Login Details',
+                  children: [
+                    _InfoRow(
+                      icon: Icons.email_outlined,
+                      label: 'Email',
+                      value: email,
+                    ),
+                    const SizedBox(height: 14),
+                    _InfoRow(
+                      icon: Icons.login_outlined,
+                      label: 'Sign-in method',
+                      value: providerName,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _ActionCard(
+                  icon: Icons.lock_reset,
+                  title: 'Reset Password',
+                  subtitle: 'Send a password reset email to your account',
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
 
-                  if (user?.email == null) {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('No email found for this account.'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  try {
-                    await FirebaseAuth.instance.sendPasswordResetEmail(
-                      email: user!.email!,
-                    );
-
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Password reset email sent to ${user.email}',
+                    if (user?.email == null) {
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('No email found for this account.'),
                         ),
-                      ),
-                    );
-                  } catch (e) {
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Could not send password reset email.'),
-                      ),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              _ActionCard(
-                icon: Icons.logout,
-                title: 'Sign Out',
-                subtitle: 'Log out of your account on this device',
-                onTap: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (context.mounted) {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
+                      );
+                      return;
+                    }
+
+                    try {
+                      await FirebaseAuth.instance.sendPasswordResetEmail(
+                        email: user!.email!,
+                      );
+
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Password reset email sent to ${user.email}',
+                          ),
+                        ),
+                      );
+                    } catch (e) {
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Could not send password reset email.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                _ActionCard(
+                  icon: Icons.logout,
+                  title: 'Sign Out',
+                  subtitle: 'Log out of your account on this device',
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    if (context.mounted) {
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -321,5 +325,18 @@ class _ActionCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _NoStretchScrollBehavior extends ScrollBehavior {
+  const _NoStretchScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }

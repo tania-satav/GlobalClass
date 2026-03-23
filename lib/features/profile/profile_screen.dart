@@ -5,8 +5,28 @@ import 'account_screen.dart';
 import 'personalisation_screen.dart';
 import 'reminders_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Future<void> _openScreen(BuildContext context, Widget screen) async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+
+    if (!mounted) return;
+
+    if (result != null && result.isNotEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +89,7 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Account',
                 subtitle: 'Login details, email, password reset and sign out',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AccountScreen(),
-                    ),
-                  );
+                  _openScreen(context, const AccountScreen());
                 },
               ),
               const SizedBox(height: 16),
@@ -83,12 +98,7 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Personalisation',
                 subtitle: 'Weight, activity level, daily goal and units',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PersonalisationScreen(),
-                    ),
-                  );
+                  _openScreen(context, const PersonalisationScreen());
                 },
               ),
               const SizedBox(height: 16),
@@ -97,12 +107,7 @@ class ProfileScreen extends StatelessWidget {
                 title: 'Reminders',
                 subtitle: 'Notification frequency, timing and quiet hours',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RemindersScreen(),
-                    ),
-                  );
+                  _openScreen(context, const RemindersScreen());
                 },
               ),
               const Spacer(),

@@ -10,7 +10,6 @@ class RemindersScreen extends StatefulWidget {
 
 class _RemindersScreenState extends State<RemindersScreen> {
   bool _remindersEnabled = true;
-  bool _showSavedMessage = false;
   double _frequencyHours = 2;
 
   TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
@@ -37,19 +36,12 @@ class _RemindersScreenState extends State<RemindersScreen> {
     if (picked != null) {
       setState(() {
         onSelected(picked);
-        _showSavedMessage = false;
       });
     }
   }
 
   void _savePreferences() {
-    setState(() {
-      _showSavedMessage = true;
-    });
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Reminder preferences saved')));
+    Navigator.pop(context, 'Reminder preferences saved');
   }
 
   @override
@@ -70,175 +62,169 @@ class _RemindersScreenState extends State<RemindersScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            children: [
-              _SectionCard(
-                title: 'Reminder Settings',
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                      value: _remindersEnabled,
-                      activeColor: const Color(0xFF2F45FF),
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text(
-                        'Enable Reminders',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1D3557),
+        child: ScrollConfiguration(
+          behavior: const _NoStretchScrollBehavior(),
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(
+              children: [
+                _SectionCard(
+                  title: 'Reminder Settings',
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        value: _remindersEnabled,
+                        activeColor: const Color(0xFF2F45FF),
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text(
+                          'Enable Reminders',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1D3557),
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Receive hydration reminders throughout the day',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _remindersEnabled = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Opacity(
+                        opacity: _remindersEnabled ? 1 : 0.5,
+                        child: IgnorePointer(
+                          ignoring: !_remindersEnabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Reminder frequency: every ${_frequencyHours.toInt()} hour${_frequencyHours.toInt() == 1 ? '' : 's'}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1D3557),
+                                ),
+                              ),
+                              Slider(
+                                value: _frequencyHours,
+                                min: 1,
+                                max: 4,
+                                divisions: 3,
+                                label: '${_frequencyHours.toInt()}h',
+                                onChanged: (value) {
+                                  setState(() {
+                                    _frequencyHours = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      subtitle: const Text(
-                        'Receive hydration reminders throughout the day',
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: 'Reminder Hours',
+                  child: Column(
+                    children: [
+                      _TimeTile(
+                        label: 'Start reminders',
+                        value: _formatTime(_startTime),
+                        onTap: _remindersEnabled
+                            ? () => _pickTime(
+                                initialTime: _startTime,
+                                onSelected: (value) => _startTime = value,
+                              )
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      _TimeTile(
+                        label: 'End reminders',
+                        value: _formatTime(_endTime),
+                        onTap: _remindersEnabled
+                            ? () => _pickTime(
+                                initialTime: _endTime,
+                                onSelected: (value) => _endTime = value,
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: 'Quiet Hours',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Set times when you do not want to receive notifications.',
                         style: TextStyle(
                           fontSize: 13,
+                          height: 1.4,
                           color: Colors.black54,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          _remindersEnabled = value;
-                          _showSavedMessage = false;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    Opacity(
-                      opacity: _remindersEnabled ? 1 : 0.5,
-                      child: IgnorePointer(
-                        ignoring: !_remindersEnabled,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Reminder frequency: every ${_frequencyHours.toInt()} hour${_frequencyHours.toInt() == 1 ? '' : 's'}',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1D3557),
-                              ),
-                            ),
-                            Slider(
-                              value: _frequencyHours,
-                              min: 1,
-                              max: 4,
-                              divisions: 3,
-                              label: '${_frequencyHours.toInt()}h',
-                              onChanged: (value) {
-                                setState(() {
-                                  _frequencyHours = value;
-                                  _showSavedMessage = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                      const SizedBox(height: 14),
+                      _TimeTile(
+                        label: 'Quiet hours start',
+                        value: _formatTime(_quietStart),
+                        onTap: _remindersEnabled
+                            ? () => _pickTime(
+                                initialTime: _quietStart,
+                                onSelected: (value) => _quietStart = value,
+                              )
+                            : null,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      _TimeTile(
+                        label: 'Quiet hours end',
+                        value: _formatTime(_quietEnd),
+                        onTap: _remindersEnabled
+                            ? () => _pickTime(
+                                initialTime: _quietEnd,
+                                onSelected: (value) => _quietEnd = value,
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              _SectionCard(
-                title: 'Reminder Hours',
-                child: Column(
-                  children: [
-                    _TimeTile(
-                      label: 'Start reminders',
-                      value: _formatTime(_startTime),
-                      onTap: _remindersEnabled
-                          ? () => _pickTime(
-                              initialTime: _startTime,
-                              onSelected: (value) => _startTime = value,
-                            )
-                          : null,
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _savePreferences,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F45FF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    const SizedBox(height: 12),
-                    _TimeTile(
-                      label: 'End reminders',
-                      value: _formatTime(_endTime),
-                      onTap: _remindersEnabled
-                          ? () => _pickTime(
-                              initialTime: _endTime,
-                              onSelected: (value) => _endTime = value,
-                            )
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              _SectionCard(
-                title: 'Quiet Hours',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Set times when you do not want to receive notifications.',
+                    child: const Text(
+                      'Save Reminder Preferences',
                       style: TextStyle(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    _TimeTile(
-                      label: 'Quiet hours start',
-                      value: _formatTime(_quietStart),
-                      onTap: _remindersEnabled
-                          ? () => _pickTime(
-                              initialTime: _quietStart,
-                              onSelected: (value) => _quietStart = value,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    _TimeTile(
-                      label: 'Quiet hours end',
-                      value: _formatTime(_quietEnd),
-                      onTap: _remindersEnabled
-                          ? () => _pickTime(
-                              initialTime: _quietEnd,
-                              onSelected: (value) => _quietEnd = value,
-                            )
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _savePreferences,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F45FF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    'Save Reminder Preferences',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
                   ),
                 ),
-              ),
-              if (_showSavedMessage) ...[
-                const SizedBox(height: 12),
-                const Text(
-                  'Saved successfully',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
+                const SizedBox(height: 20),
               ],
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
@@ -339,5 +325,18 @@ class _TimeTile extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _NoStretchScrollBehavior extends ScrollBehavior {
+  const _NoStretchScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }
