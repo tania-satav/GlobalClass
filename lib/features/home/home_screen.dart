@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
 import '../streaks/streaks_screen.dart';
 import 'water_intake_controller.dart';
@@ -23,18 +24,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final WaterIntakeController controller;
+  final HydrationSettings settings = HydrationSettings.instance;
 
   @override
   void initState() {
     super.initState();
     controller = WaterIntakeController(
-      goalMl: widget.initialGoalMl,
+      goalMl: settings.dailyGoalMl,
       currentMl: widget.initialCurrentMl,
     );
+    settings.addListener(_syncGoalFromSettings);
+  }
+
+  void _syncGoalFromSettings() {
+    controller.updateGoal(settings.dailyGoalMl);
   }
 
   @override
   void dispose() {
+    settings.removeListener(_syncGoalFromSettings);
     controller.dispose();
     super.dispose();
   }

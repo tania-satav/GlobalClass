@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import 'hydration_settings.dart';
 
 class PersonalisationScreen extends StatefulWidget {
   const PersonalisationScreen({super.key});
@@ -9,17 +10,30 @@ class PersonalisationScreen extends StatefulWidget {
 }
 
 class _PersonalisationScreenState extends State<PersonalisationScreen> {
-  final TextEditingController _weightController = TextEditingController(
-    text: '70',
-  );
+  late final TextEditingController _weightController;
 
-  String _selectedActivityLevel = 'Medium';
-  String _selectedUnit = 'ml';
-  int _dailyGoalMl = 2100;
+  late String _selectedActivityLevel;
+  late String _selectedUnit;
+  late int _dailyGoalMl;
+
+  final HydrationSettings _settings = HydrationSettings.instance;
 
   static const List<String> _activityLevels = ['Low', 'Medium', 'High'];
 
   static const List<String> _units = ['ml', 'L'];
+
+  @override
+  void initState() {
+    super.initState();
+    _weightController = TextEditingController(
+      text: _settings.weightKg.toStringAsFixed(
+        _settings.weightKg % 1 == 0 ? 0 : 1,
+      ),
+    );
+    _selectedActivityLevel = _settings.activityLevel;
+    _selectedUnit = _settings.unit;
+    _dailyGoalMl = _settings.dailyGoalMl;
+  }
 
   int _calculateRecommendedGoal() {
     final double? weightKg = double.tryParse(_weightController.text.trim());
@@ -87,6 +101,16 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
   }
 
   void _savePreferences() {
+    final double parsedWeight =
+        double.tryParse(_weightController.text.trim()) ?? _settings.weightKg;
+
+    _settings.updatePersonalisation(
+      weightKg: parsedWeight,
+      activityLevel: _selectedActivityLevel,
+      unit: _selectedUnit,
+      dailyGoalMl: _dailyGoalMl,
+    );
+
     Navigator.pop(context, 'Personalisation settings saved');
   }
 
