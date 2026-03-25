@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import 'hydration_settings.dart';
+import 'hydration_settings_storage.dart';
 
 class PersonalisationScreen extends StatefulWidget {
   const PersonalisationScreen({super.key});
@@ -100,7 +101,7 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
     );
   }
 
-  void _savePreferences() {
+  Future<void> _savePreferences() async {
     final double parsedWeight =
         double.tryParse(_weightController.text.trim()) ?? _settings.weightKg;
 
@@ -111,6 +112,9 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
       dailyGoalMl: _dailyGoalMl,
     );
 
+    await HydrationSettingsStorage.save(_settings);
+
+    if (!mounted) return;
     Navigator.pop(context, 'Personalisation settings saved');
   }
 

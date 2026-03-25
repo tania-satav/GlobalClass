@@ -24,4 +24,16 @@ class HydrationSettings extends ChangeNotifier {
     this.dailyGoalMl = dailyGoalMl;
     notifyListeners();
   }
+
+  void loadPersonalisation({
+    required double weightKg,
+    required String activityLevel,
+    required String unit,
+    required int dailyGoalMl,
+  }) {
+    this.weightKg = weightKg;
+    this.activityLevel = activityLevel;
+    this.unit = unit;
+    this.dailyGoalMl = dailyGoalMl;
+  }
 }
