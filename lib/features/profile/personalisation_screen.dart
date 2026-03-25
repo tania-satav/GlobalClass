@@ -12,6 +12,7 @@ class PersonalisationScreen extends StatefulWidget {
 
 class _PersonalisationScreenState extends State<PersonalisationScreen> {
   late final TextEditingController _weightController;
+  late final TextEditingController _customGoalController;
 
   late String _selectedActivityLevel;
   late String _selectedUnit;
@@ -23,6 +24,8 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
 
   static const List<String> _units = ['ml', 'L'];
 
+  static const List<int> _quickGoalOptions = [1500, 2000, 2500, 3000];
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,9 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
       text: _settings.weightKg.toStringAsFixed(
         _settings.weightKg % 1 == 0 ? 0 : 1,
       ),
+    );
+    _customGoalController = TextEditingController(
+      text: _settings.dailyGoalMl.toString(),
     );
     _selectedActivityLevel = _settings.activityLevel;
     _selectedUnit = _settings.unit;
@@ -60,16 +66,43 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
     return recommendedMl.round();
   }
 
+  String _formatLitresExact(int ml) {
+    String litres = (ml / 1000).toStringAsFixed(3);
+    litres = litres.replaceFirst(RegExp(r'0+$'), '');
+    litres = litres.replaceFirst(RegExp(r'\.$'), '');
+    return '$litres L';
+  }
+
   String _formatGoal(int ml) {
     if (_selectedUnit == 'L') {
-      return '${(ml / 1000).toStringAsFixed(1)} L';
+      return _formatLitresExact(ml);
     }
     return '$ml ml';
   }
 
   void _useRecommendedGoal() {
+    final recommended = _calculateRecommendedGoal();
     setState(() {
-      _dailyGoalMl = _calculateRecommendedGoal();
+      _dailyGoalMl = recommended;
+      _customGoalController.text = recommended.toString();
+    });
+  }
+
+  void _applyQuickGoal(int goal) {
+    setState(() {
+      _dailyGoalMl = goal;
+      _customGoalController.text = goal.toString();
+    });
+  }
+
+  void _updateCustomGoal(String value) {
+    final parsed = int.tryParse(value.trim());
+
+    if (parsed == null) return;
+    if (parsed < 500 || parsed > 6000) return;
+
+    setState(() {
+      _dailyGoalMl = parsed;
     });
   }
 
@@ -105,6 +138,20 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
     final double parsedWeight =
         double.tryParse(_weightController.text.trim()) ?? _settings.weightKg;
 
+    final int parsedGoal =
+        int.tryParse(_customGoalController.text.trim()) ?? _dailyGoalMl;
+
+    if (parsedGoal < 500 || parsedGoal > 6000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a daily goal between 500 ml and 6000 ml'),
+        ),
+      );
+      return;
+    }
+
+    _dailyGoalMl = parsedGoal;
+
     _settings.updatePersonalisation(
       weightKg: parsedWeight,
       activityLevel: _selectedActivityLevel,
@@ -121,6 +168,7 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
   @override
   void dispose() {
     _weightController.dispose();
+    _customGoalController.dispose();
     super.dispose();
   }
 
@@ -264,13 +312,13 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
                           color: Color(0xFF1D3557),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Current daily goal: ${_formatGoal(_dailyGoalMl)}',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Based on your weight and activity level.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -294,6 +342,103 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 18),
+                      const Divider(),
+                      const SizedBox(height: 18),
+                      const Text(
+                        'Custom Daily Goal',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1D3557),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Prefer your own target? Set it here.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _customGoalController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: 'Enter custom goal',
+                                filled: true,
+                                fillColor: const Color(0xFFF7FBFD),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 14,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              onChanged: _updateCustomGoal,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF7FBFD),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text(
+                              'ml',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: _quickGoalOptions.map((goal) {
+                          final isSelected = _dailyGoalMl == goal;
+                          return ChoiceChip(
+                            label: Text('${goal}ml'),
+                            selected: isSelected,
+                            onSelected: (_) => _applyQuickGoal(goal),
+                            selectedColor: const Color(0xFF2F45FF),
+                            labelStyle: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF1D3557),
+                              fontWeight: FontWeight.w700,
+                            ),
+                            backgroundColor: const Color(0xFFF7FBFD),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Current daily goal: ${_formatGoal(_dailyGoalMl)}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ),
