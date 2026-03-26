@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
+import '../stats/stats_screen.dart';
 import '../streaks/streaks_screen.dart';
 import 'water_intake_controller.dart';
 import 'widgets/intake_progress_card.dart';
@@ -167,6 +168,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => const StreaksScreen(),
                   ),
+                );
+              }
+
+              if (index == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StatsScreen()),
                 );
               }
 
