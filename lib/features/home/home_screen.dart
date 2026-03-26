@@ -4,6 +4,7 @@ import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
 import '../stats/stats_screen.dart';
 import '../streaks/streaks_screen.dart';
+import 'today_hydration_state.dart';
 import 'water_intake_controller.dart';
 import 'widgets/intake_progress_card.dart';
 import 'widgets/did_you_know_card.dart';
@@ -26,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final WaterIntakeController controller;
   final HydrationSettings settings = HydrationSettings.instance;
+  final TodayHydrationState todayHydrationState = TodayHydrationState.instance;
 
   @override
   void initState() {
@@ -35,15 +37,22 @@ class _HomeScreenState extends State<HomeScreen> {
       currentMl: widget.initialCurrentMl,
     );
     settings.addListener(_syncGoalFromSettings);
+    controller.addListener(_syncTodayIntake);
+    _syncTodayIntake();
   }
 
   void _syncGoalFromSettings() {
     controller.updateGoal(settings.dailyGoalMl);
   }
 
+  void _syncTodayIntake() {
+    todayHydrationState.setCurrentIntake(controller.currentMl);
+  }
+
   @override
   void dispose() {
     settings.removeListener(_syncGoalFromSettings);
+    controller.removeListener(_syncTodayIntake);
     controller.dispose();
     super.dispose();
   }
