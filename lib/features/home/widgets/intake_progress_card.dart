@@ -10,9 +10,20 @@ class IntakeProgressCard extends StatelessWidget {
     required this.currentMl,
   });
 
+  String _formatLabel(int value) {
+    return '${value}ml';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double progress = (currentMl / goalMl).clamp(0.0, 1.0);
+    final double progress = goalMl == 0
+        ? 0
+        : (currentMl / goalMl).clamp(0.0, 1.0);
+
+    final int topLabel = 0;
+    final int rightLabel = (goalMl / 3).round();
+    final int bottomLabel = ((goalMl * 2) / 3).round();
+    final int leftLabel = goalMl;
 
     return SizedBox(
       width: 280,
@@ -31,16 +42,23 @@ class IntakeProgressCard extends StatelessWidget {
             ),
           ),
 
-          // Labels around ring
-          const Positioned(top: 18, child: Text('0ml', style: _labelStyle)),
-          const Positioned(right: 10, child: Text('500ml', style: _labelStyle)),
-          const Positioned(
-            bottom: 12,
-            child: Text('1000ml', style: _labelStyle),
+          Positioned(
+            top: 18,
+            child: Text(_formatLabel(topLabel), style: _labelStyle),
           ),
-          const Positioned(left: 8, child: Text('1500ml', style: _labelStyle)),
+          Positioned(
+            right: 10,
+            child: Text(_formatLabel(rightLabel), style: _labelStyle),
+          ),
+          Positioned(
+            bottom: 12,
+            child: Text(_formatLabel(bottomLabel), style: _labelStyle),
+          ),
+          Positioned(
+            left: 8,
+            child: Text(_formatLabel(leftLabel), style: _labelStyle),
+          ),
 
-          // Center placeholder (swap to animated plant later)
           Container(
             width: 170,
             height: 170,
