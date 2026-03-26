@@ -38,9 +38,9 @@ class HomeBottomNav extends StatelessWidget {
           label: 'Garden',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications_none),
-          activeIcon: Icon(Icons.notifications),
-          label: 'Alerts',
+          icon: Icon(Icons.bar_chart_outlined),
+          activeIcon: Icon(Icons.bar_chart),
+          label: 'Stats',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
