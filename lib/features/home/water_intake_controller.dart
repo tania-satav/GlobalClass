@@ -8,11 +8,6 @@ class WaterIntakeController extends ChangeNotifier {
 
   void addWater(int amount) {
     currentMl += amount;
-
-    if (currentMl > goalMl) {
-      currentMl = goalMl;
-    }
-
     notifyListeners();
   }
 
@@ -33,11 +28,6 @@ class WaterIntakeController extends ChangeNotifier {
 
   void updateGoal(int newGoalMl) {
     goalMl = newGoalMl;
-
-    if (currentMl > goalMl) {
-      currentMl = goalMl;
-    }
-
     notifyListeners();
   }
 }
