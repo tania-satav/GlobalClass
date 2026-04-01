@@ -30,13 +30,11 @@ class HydrationHistoryState extends ChangeNotifier {
 
   List<HydrationHistoryEntry> get entries {
     final copiedEntries = List<HydrationHistoryEntry>.from(_entries);
-
     copiedEntries.sort((a, b) => b.date.compareTo(a.date));
-
     return List.unmodifiable(copiedEntries);
   }
 
-  void addOrUpdateEntry({
+  bool addOrUpdateEntry({
     required DateTime date,
     required int intakeMl,
     required int goalMl,
@@ -54,12 +52,25 @@ class HydrationHistoryState extends ChangeNotifier {
     );
 
     if (index >= 0) {
+      final existingEntry = _entries[index];
+
+      final isUnchanged =
+          existingEntry.intakeMl == intakeMl &&
+          existingEntry.goalMl == goalMl &&
+          _isSameDay(existingEntry.date, normalizedDate);
+
+      if (isUnchanged) {
+        return false;
+      }
+
       _entries[index] = newEntry;
+      notifyListeners();
+      return true;
     } else {
       _entries.add(newEntry);
+      notifyListeners();
+      return true;
     }
-
-    notifyListeners();
   }
 
   HydrationHistoryEntry? entryForDate(DateTime date) {
@@ -84,7 +95,6 @@ class HydrationHistoryState extends ChangeNotifier {
     }).toList();
 
     filtered.sort((a, b) => b.date.compareTo(a.date));
-
     return filtered;
   }
 
@@ -96,7 +106,6 @@ class HydrationHistoryState extends ChangeNotifier {
     }).toList();
 
     filtered.sort((a, b) => b.date.compareTo(a.date));
-
     return filtered;
   }
 
@@ -110,7 +119,6 @@ class HydrationHistoryState extends ChangeNotifier {
     }).toList();
 
     filtered.sort((a, b) => b.date.compareTo(a.date));
-
     return filtered;
   }
 
