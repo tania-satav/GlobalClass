@@ -43,9 +43,26 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
+  int get _daysLogged => _filteredHistoryEntries.length;
+
   int get _dailyGoalHits => _filteredHistoryEntries
       .where((entry) => entry.intakeMl >= entry.goalMl)
       .length;
+
+  int get _totalIntakeMl =>
+      _filteredHistoryEntries.fold(0, (sum, entry) => sum + entry.intakeMl);
+
+  int get _averageIntakeMl {
+    if (_filteredHistoryEntries.isEmpty) return 0;
+    return (_totalIntakeMl / _filteredHistoryEntries.length).round();
+  }
+
+  int get _goalHitRatePercent {
+    if (_filteredHistoryEntries.isEmpty) return 0;
+    return ((_dailyGoalHits / _filteredHistoryEntries.length) * 100)
+        .round()
+        .clamp(0, 100);
+  }
 
   String get _remainingOrOverText {
     if (_remainingOrOverMl == 0) {
@@ -131,6 +148,19 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
+  String get _rangeSummaryTitle {
+    switch (_selectedRange) {
+      case 'Last 7 Days':
+        return 'Range Summary (Last 7 Days)';
+      case 'This Month':
+        return 'Range Summary (This Month)';
+      case 'Past 12 Months':
+        return 'Range Summary (Past 12 Months)';
+      default:
+        return 'Range Summary';
+    }
+  }
+
   String get _dailyGoalHitsSubtitle {
     switch (_selectedRange) {
       case 'Last 7 Days':
@@ -205,7 +235,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Quick Summary',
+                    'Today',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -237,9 +267,9 @@ class _StatsScreenState extends State<StatsScreen> {
                         subtitle: _remainingOrOverSubtitle,
                       ),
                       _SummaryCard(
-                        title: 'Daily Goal Hits',
-                        value: '$_dailyGoalHits',
-                        subtitle: _dailyGoalHitsSubtitle,
+                        title: 'Goal Progress',
+                        value: '$_completionPercent%',
+                        subtitle: 'Completion against today’s goal',
                       ),
                     ],
                   ),
@@ -277,6 +307,54 @@ class _StatsScreenState extends State<StatsScreen> {
                             color: Colors.black54,
                             fontWeight: FontWeight.w500,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Over Time',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _SectionCard(
+                    title: _rangeSummaryTitle,
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.15,
+                      children: [
+                        _SummaryCard(
+                          title: 'Days Logged',
+                          value: '$_daysLogged',
+                          subtitle: 'Days with hydration data in this range',
+                        ),
+                        _SummaryCard(
+                          title: 'Goal Hits',
+                          value: '$_dailyGoalHits',
+                          subtitle: _dailyGoalHitsSubtitle,
+                        ),
+                        _SummaryCard(
+                          title: 'Average Intake',
+                          value: '$_averageIntakeMl ml',
+                          subtitle: 'Average intake per logged day',
+                        ),
+                        _SummaryCard(
+                          title: 'Total Intake',
+                          value: '$_totalIntakeMl ml',
+                          subtitle: 'Total water logged in this range',
+                        ),
+                        _SummaryCard(
+                          title: 'Goal Hit Rate',
+                          value: '$_goalHitRatePercent%',
+                          subtitle: 'Percent of logged days where goal was hit',
                         ),
                       ],
                     ),
