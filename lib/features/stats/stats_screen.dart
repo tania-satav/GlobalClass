@@ -92,7 +92,7 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   void initState() {
     super.initState();
-    _syncTodayIntoHistory();
+    _initializeHistory();
     _settings.addListener(_syncTodayIntoHistory);
     _todayHydrationState.addListener(_syncTodayIntoHistory);
   }
@@ -104,7 +104,14 @@ class _StatsScreenState extends State<StatsScreen> {
     super.dispose();
   }
 
+  Future<void> _initializeHistory() async {
+    await _historyState.loadHistory();
+    _syncTodayIntoHistory();
+  }
+
   void _syncTodayIntoHistory() {
+    if (!_historyState.isLoaded) return;
+
     _historyState.addOrUpdateEntry(
       date: DateTime.now(),
       intakeMl: _todayIntakeMl,
@@ -183,6 +190,13 @@ class _StatsScreenState extends State<StatsScreen> {
         _historyState,
       ]),
       builder: (context, _) {
+        if (!_historyState.isLoaded) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFAEDFEA),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         final filteredEntries = _filteredHistoryEntries;
 
         return Scaffold(

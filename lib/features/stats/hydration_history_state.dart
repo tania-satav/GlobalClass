@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HydrationHistoryEntry {
   final DateTime date;
@@ -18,20 +21,65 @@ class HydrationHistoryEntry {
       goalMl: goalMl ?? this.goalMl,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date.toIso8601String(),
+      'intakeMl': intakeMl,
+      'goalMl': goalMl,
+    };
+  }
+
+  factory HydrationHistoryEntry.fromJson(Map<String, dynamic> json) {
+    return HydrationHistoryEntry(
+      date: DateTime.parse(json['date'] as String),
+      intakeMl: json['intakeMl'] as int,
+      goalMl: json['goalMl'] as int,
+    );
+  }
 }
 
 class HydrationHistoryState extends ChangeNotifier {
   static final HydrationHistoryState instance =
       HydrationHistoryState._internal();
 
+  static const String _storageKey = 'hydration_history_entries';
+
   HydrationHistoryState._internal();
 
   final List<HydrationHistoryEntry> _entries = [];
+  bool _isLoaded = false;
 
   List<HydrationHistoryEntry> get entries {
     final copiedEntries = List<HydrationHistoryEntry>.from(_entries);
     copiedEntries.sort((a, b) => b.date.compareTo(a.date));
     return List.unmodifiable(copiedEntries);
+  }
+
+  bool get isLoaded => _isLoaded;
+
+  Future<void> loadHistory() async {
+    if (_isLoaded) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final rawJson = prefs.getString(_storageKey);
+
+    if (rawJson != null && rawJson.isNotEmpty) {
+      final decoded = jsonDecode(rawJson) as List<dynamic>;
+
+      _entries
+        ..clear()
+        ..addAll(
+          decoded.map(
+            (item) => HydrationHistoryEntry.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          ),
+        );
+    }
+
+    _isLoaded = true;
+    notifyListeners();
   }
 
   bool addOrUpdateEntry({
@@ -64,10 +112,12 @@ class HydrationHistoryState extends ChangeNotifier {
       }
 
       _entries[index] = newEntry;
+      _saveHistory();
       notifyListeners();
       return true;
     } else {
       _entries.add(newEntry);
+      _saveHistory();
       notifyListeners();
       return true;
     }
@@ -124,7 +174,16 @@ class HydrationHistoryState extends ChangeNotifier {
 
   void clearAll() {
     _entries.clear();
+    _saveHistory();
     notifyListeners();
+  }
+
+  Future<void> _saveHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = jsonEncode(
+      _entries.map((entry) => entry.toJson()).toList(),
+    );
+    await prefs.setString(_storageKey, encoded);
   }
 
   DateTime _normalizeDate(DateTime date) {
