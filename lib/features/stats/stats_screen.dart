@@ -3,6 +3,7 @@ import '../home/home_screen.dart';
 import '../home/today_hydration_state.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import '../profile/hydration_settings.dart';
+import 'hydration_history_state.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -22,14 +23,9 @@ class _StatsScreenState extends State<StatsScreen> {
 
   final HydrationSettings _settings = HydrationSettings.instance;
   final TodayHydrationState _todayHydrationState = TodayHydrationState.instance;
+  final HydrationHistoryState _historyState = HydrationHistoryState.instance;
 
-  final List<_HistoryEntry> _historyEntries = const [
-    _HistoryEntry(label: 'Wed 26 Mar', intakeMl: 2768, goalMl: 2500),
-    _HistoryEntry(label: 'Tue 25 Mar', intakeMl: 2100, goalMl: 2500),
-    _HistoryEntry(label: 'Mon 24 Mar', intakeMl: 2500, goalMl: 2500),
-    _HistoryEntry(label: 'Sun 23 Mar', intakeMl: 1800, goalMl: 2200),
-    _HistoryEntry(label: 'Sat 22 Mar', intakeMl: 2400, goalMl: 2200),
-  ];
+  List<HydrationHistoryEntry> get _historyEntries => _historyState.entries;
 
   int get _todayGoalMl => _settings.dailyGoalMl;
   int get _todayIntakeMl => _todayHydrationState.currentIntakeMl;
@@ -65,10 +61,53 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _syncTodayIntoHistory();
+  }
+
+  void _syncTodayIntoHistory() {
+    _historyState.addOrUpdateEntry(
+      date: DateTime.now(),
+      intakeMl: _todayIntakeMl,
+      goalMl: _todayGoalMl,
+    );
+  }
+
+  String _formatEntryLabel(DateTime date) {
+    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    final weekday = weekdays[date.weekday - 1];
+    final month = months[date.month - 1];
+
+    return '$weekday ${date.day} $month';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_settings, _todayHydrationState]),
+      animation: Listenable.merge([
+        _settings,
+        _todayHydrationState,
+        _historyState,
+      ]),
       builder: (context, _) {
+        _syncTodayIntoHistory();
+
         return Scaffold(
           backgroundColor: const Color(0xFFAEDFEA),
           appBar: AppBar(
@@ -198,14 +237,29 @@ class _StatsScreenState extends State<StatsScreen> {
                   const SizedBox(height: 16),
                   _SectionCard(
                     title: 'Hydration History',
-                    child: Column(
-                      children: _historyEntries.map((entry) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _HistoryTile(entry: entry),
-                        );
-                      }).toList(),
-                    ),
+                    child: _historyEntries.isEmpty
+                        ? const Text(
+                            'No hydration history yet.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        : Column(
+                            children: _historyEntries.map((entry) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _HistoryTile(
+                                  entry: _HistoryTileEntry(
+                                    label: _formatEntryLabel(entry.date),
+                                    intakeMl: entry.intakeMl,
+                                    goalMl: entry.goalMl,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -327,7 +381,7 @@ class _SectionCard extends StatelessWidget {
 class _HistoryTile extends StatelessWidget {
   const _HistoryTile({required this.entry});
 
-  final _HistoryEntry entry;
+  final _HistoryTileEntry entry;
 
   String get _statusText {
     final difference = entry.intakeMl - entry.goalMl;
@@ -396,12 +450,12 @@ class _HistoryTile extends StatelessWidget {
   }
 }
 
-class _HistoryEntry {
+class _HistoryTileEntry {
   final String label;
   final int intakeMl;
   final int goalMl;
 
-  const _HistoryEntry({
+  const _HistoryTileEntry({
     required this.label,
     required this.intakeMl,
     required this.goalMl,
