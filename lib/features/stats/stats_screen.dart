@@ -25,15 +25,27 @@ class _StatsScreenState extends State<StatsScreen> {
   final TodayHydrationState _todayHydrationState = TodayHydrationState.instance;
   final HydrationHistoryState _historyState = HydrationHistoryState.instance;
 
-  List<HydrationHistoryEntry> get _historyEntries => _historyState.entries;
-
   int get _todayGoalMl => _settings.dailyGoalMl;
   int get _todayIntakeMl => _todayHydrationState.currentIntakeMl;
 
   int get _remainingOrOverMl => _todayIntakeMl - _todayGoalMl;
 
-  int get _dailyGoalHits =>
-      _historyEntries.where((entry) => entry.intakeMl >= entry.goalMl).length;
+  List<HydrationHistoryEntry> get _filteredHistoryEntries {
+    switch (_selectedRange) {
+      case 'Last 7 Days':
+        return _historyState.entriesForLast7Days();
+      case 'This Month':
+        return _historyState.entriesForThisMonth();
+      case 'Past 12 Months':
+        return _historyState.entriesForPast12Months();
+      default:
+        return _historyState.entriesForLast7Days();
+    }
+  }
+
+  int get _dailyGoalHits => _filteredHistoryEntries
+      .where((entry) => entry.intakeMl >= entry.goalMl)
+      .length;
 
   String get _remainingOrOverText {
     if (_remainingOrOverMl == 0) {
@@ -64,6 +76,15 @@ class _StatsScreenState extends State<StatsScreen> {
   void initState() {
     super.initState();
     _syncTodayIntoHistory();
+    _settings.addListener(_syncTodayIntoHistory);
+    _todayHydrationState.addListener(_syncTodayIntoHistory);
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_syncTodayIntoHistory);
+    _todayHydrationState.removeListener(_syncTodayIntoHistory);
+    super.dispose();
   }
 
   void _syncTodayIntoHistory() {
@@ -97,6 +118,32 @@ class _StatsScreenState extends State<StatsScreen> {
     return '$weekday ${date.day} $month';
   }
 
+  String get _historySectionTitle {
+    switch (_selectedRange) {
+      case 'Last 7 Days':
+        return 'Hydration History (Last 7 Days)';
+      case 'This Month':
+        return 'Hydration History (This Month)';
+      case 'Past 12 Months':
+        return 'Hydration History (Past 12 Months)';
+      default:
+        return 'Hydration History';
+    }
+  }
+
+  String get _dailyGoalHitsSubtitle {
+    switch (_selectedRange) {
+      case 'Last 7 Days':
+        return 'Days where your goal was reached in the last 7 days';
+      case 'This Month':
+        return 'Days where your goal was reached this month';
+      case 'Past 12 Months':
+        return 'Days where your goal was reached in the past 12 months';
+      default:
+        return 'Days where your goal was reached';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -106,7 +153,7 @@ class _StatsScreenState extends State<StatsScreen> {
         _historyState,
       ]),
       builder: (context, _) {
-        _syncTodayIntoHistory();
+        final filteredEntries = _filteredHistoryEntries;
 
         return Scaffold(
           backgroundColor: const Color(0xFFAEDFEA),
@@ -192,7 +239,7 @@ class _StatsScreenState extends State<StatsScreen> {
                       _SummaryCard(
                         title: 'Daily Goal Hits',
                         value: '$_dailyGoalHits',
-                        subtitle: 'Days where your goal was reached',
+                        subtitle: _dailyGoalHitsSubtitle,
                       ),
                     ],
                   ),
@@ -236,10 +283,10 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                   const SizedBox(height: 16),
                   _SectionCard(
-                    title: 'Hydration History',
-                    child: _historyEntries.isEmpty
+                    title: _historySectionTitle,
+                    child: filteredEntries.isEmpty
                         ? const Text(
-                            'No hydration history yet.',
+                            'No hydration history available for this range yet.',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
@@ -247,7 +294,7 @@ class _StatsScreenState extends State<StatsScreen> {
                             ),
                           )
                         : Column(
-                            children: _historyEntries.map((entry) {
+                            children: filteredEntries.map((entry) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: _HistoryTile(
