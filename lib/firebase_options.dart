@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'keep-me-hydrated',
     storageBucket: 'keep-me-hydrated.firebasestorage.app',
   );
+
 }
