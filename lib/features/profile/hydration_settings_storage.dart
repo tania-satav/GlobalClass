@@ -2,29 +2,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'hydration_settings.dart';
 
 class HydrationSettingsStorage {
-  static const String _weightKey = 'hydration_weight_kg';
-  static const String _activityLevelKey = 'hydration_activity_level';
-  static const String _unitKey = 'hydration_unit';
-  static const String _dailyGoalKey = 'hydration_daily_goal_ml';
+  static const String _dailyGoalKey = 'daily_goal_ml';
+  static const int _defaultDailyGoalMl = 2000;
 
-  static Future<void> save(HydrationSettings settings) async {
+  static Future<int> loadDailyGoalMl() async {
     final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setDouble(_weightKey, settings.weightKg);
-    await prefs.setString(_activityLevelKey, settings.activityLevel);
-    await prefs.setString(_unitKey, settings.unit);
-    await prefs.setInt(_dailyGoalKey, settings.dailyGoalMl);
+    return prefs.getInt(_dailyGoalKey) ?? _defaultDailyGoalMl;
   }
 
-  static Future<void> loadInto(HydrationSettings settings) async {
+  static Future<void> saveDailyGoalMl(int value) async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_dailyGoalKey, value);
+  }
 
-    settings.loadPersonalisation(
-      weightKg: prefs.getDouble(_weightKey) ?? settings.weightKg,
-      activityLevel:
-          prefs.getString(_activityLevelKey) ?? settings.activityLevel,
-      unit: prefs.getString(_unitKey) ?? settings.unit,
-      dailyGoalMl: prefs.getInt(_dailyGoalKey) ?? settings.dailyGoalMl,
-    );
+  static Future<HydrationSettings> load() async {
+    final goal = await loadDailyGoalMl();
+    final settings = HydrationSettings.instance;
+    settings.dailyGoalMl = goal;
+    return settings;
+  }
+
+  static Future<void> save(HydrationSettings settings) async {
+    await saveDailyGoalMl(settings.dailyGoalMl);
   }
 }
