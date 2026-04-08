@@ -1,28 +1,52 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../database/database_helper.dart';
 import 'hydration_settings.dart';
 
 class HydrationSettingsStorage {
-  static const String _dailyGoalKey = 'daily_goal_ml';
-  static const int _defaultDailyGoalMl = 2000;
+  static const int _defaultDailyGoalMl = 2100;
+  static final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
   static Future<int> loadDailyGoalMl() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_dailyGoalKey) ?? _defaultDailyGoalMl;
+    final settings = await _databaseHelper.getSettings();
+    return (settings?['daily_goal_ml'] as int?) ?? _defaultDailyGoalMl;
   }
 
   static Future<void> saveDailyGoalMl(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_dailyGoalKey, value);
+    final currentSettings = await _databaseHelper.getSettings();
+
+    await _databaseHelper.upsertSettings(
+      weightKg: (currentSettings?['weight_kg'] as num?)?.toDouble() ?? 70.0,
+      activityLevel:
+          (currentSettings?['activity_level'] as String?) ?? 'Medium',
+      unit: (currentSettings?['unit'] as String?) ?? 'ml',
+      dailyGoalMl: value,
+      lastOpenDate: currentSettings?['last_open_date'] as String?,
+    );
   }
 
   static Future<HydrationSettings> load() async {
-    final goal = await loadDailyGoalMl();
+    final settingsRow = await _databaseHelper.getSettings();
     final settings = HydrationSettings.instance;
-    settings.dailyGoalMl = goal;
+
+    settings.loadPersonalisation(
+      weightKg: (settingsRow?['weight_kg'] as num?)?.toDouble() ?? 70.0,
+      activityLevel:
+          (settingsRow?['activity_level'] as String?) ?? 'Medium',
+      unit: (settingsRow?['unit'] as String?) ?? 'ml',
+      dailyGoalMl: (settingsRow?['daily_goal_ml'] as int?) ?? _defaultDailyGoalMl,
+    );
+
     return settings;
   }
 
   static Future<void> save(HydrationSettings settings) async {
-    await saveDailyGoalMl(settings.dailyGoalMl);
+    final currentSettings = await _databaseHelper.getSettings();
+
+    await _databaseHelper.upsertSettings(
+      weightKg: settings.weightKg,
+      activityLevel: settings.activityLevel,
+      unit: settings.unit,
+      dailyGoalMl: settings.dailyGoalMl,
+      lastOpenDate: currentSettings?['last_open_date'] as String?,
+    );
   }
 }

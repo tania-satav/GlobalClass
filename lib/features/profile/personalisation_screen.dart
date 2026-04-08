@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../database/database_helper.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import 'hydration_settings.dart';
 import 'hydration_settings_storage.dart';
@@ -19,11 +20,10 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
   late int _dailyGoalMl;
 
   final HydrationSettings _settings = HydrationSettings.instance;
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
   static const List<String> _activityLevels = ['Low', 'Medium', 'High'];
-
   static const List<String> _units = ['ml', 'L'];
-
   static const List<int> _quickGoalOptions = [1500, 2000, 2500, 3000];
 
   @override
@@ -78,6 +78,13 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
       return _formatLitresExact(ml);
     }
     return '$ml ml';
+  }
+
+  String _dateOnly(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
   }
 
   void _useRecommendedGoal() {
@@ -160,6 +167,22 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
     );
 
     await HydrationSettingsStorage.save(_settings);
+
+    final today = _dateOnly(DateTime.now());
+    final todayRow = await _databaseHelper.getDailyIntakeByDate(today);
+
+    if (todayRow != null) {
+      await _databaseHelper.upsertDailyIntake(
+        intakeDate: today,
+        intakeMl: (todayRow['intake_ml'] as int?) ?? 0,
+        goalMl: _dailyGoalMl,
+      );
+    } else {
+      await _databaseHelper.ensureDailyIntakeRow(
+        intakeDate: today,
+        goalMl: _dailyGoalMl,
+      );
+    }
 
     if (!mounted) return;
     Navigator.pop(context, 'Personalisation settings saved');
