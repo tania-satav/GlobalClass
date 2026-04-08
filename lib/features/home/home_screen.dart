@@ -6,9 +6,9 @@ import '../stats/stats_screen.dart';
 import '../streaks/streaks_screen.dart';
 import 'today_hydration_state.dart';
 import 'water_intake_controller.dart';
-import 'widgets/intake_progress_card.dart';
 import 'widgets/did_you_know_card.dart';
 import 'widgets/home_bottom_nav.dart';
+import 'widgets/intake_progress_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -32,27 +32,55 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     controller = WaterIntakeController(
       goalMl: settings.dailyGoalMl,
-      currentMl: widget.initialCurrentMl,
+      currentMl: 0,
     );
+
     settings.addListener(_syncGoalFromSettings);
-    controller.addListener(_syncTodayIntake);
-    _syncTodayIntake();
+    controller.addListener(_syncTodayIntakeFromController);
+
+    _initializeTodayState();
+  }
+
+  Future<void> _initializeTodayState() async {
+    await todayHydrationState.loadToday(goalMl: settings.dailyGoalMl);
+
+    controller.loadState(
+  goalMl: settings.dailyGoalMl,
+  currentMl: todayHydrationState.currentIntakeMl,
+);
   }
 
   void _syncGoalFromSettings() {
     controller.updateGoal(settings.dailyGoalMl);
+    _syncTodayIntakeFromController();
   }
 
-  void _syncTodayIntake() {
-    todayHydrationState.setCurrentIntake(controller.currentMl);
+  Future<void> _syncTodayIntakeFromController() async {
+    await todayHydrationState.setCurrentIntake(
+      value: controller.currentMl,
+      goalMl: controller.goalMl,
+    );
+  }
+
+  Future<void> _addWater(int amount) async {
+    controller.addWater(amount);
+  }
+
+  Future<void> _removeWater(int amount) async {
+    controller.removeWater(amount);
+  }
+
+  Future<void> _resetWater() async {
+    controller.resetWater();
   }
 
   @override
   void dispose() {
     settings.removeListener(_syncGoalFromSettings);
-    controller.removeListener(_syncTodayIntake);
+    controller.removeListener(_syncTodayIntakeFromController);
     controller.dispose();
     super.dispose();
   }
@@ -60,8 +88,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: Listenable.merge([controller, todayHydrationState]),
       builder: (context, _) {
+        if (!todayHydrationState.isLoaded) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFAEDFEA),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         return Scaffold(
           backgroundColor: const Color(0xFFAEDFEA),
           appBar: AppBar(
@@ -95,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     runSpacing: 10,
                     children: [
                       ElevatedButton(
-                        onPressed: () => controller.addWater(250),
+                        onPressed: () => _addWater(250),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFF1D3557),
@@ -110,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () => controller.addWater(500),
+                        onPressed: () => _addWater(500),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFF1D3557),
@@ -125,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () => controller.removeWater(250),
+                        onPressed: () => _removeWater(250),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFF1D3557),
@@ -140,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: controller.resetWater,
+                        onPressed: _resetWater,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2F45FF),
                           foregroundColor: Colors.white,

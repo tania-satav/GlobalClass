@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../database/database_helper.dart';
 
 class HydrationHistoryEntry {
   final DateTime date;
@@ -21,31 +19,15 @@ class HydrationHistoryEntry {
       goalMl: goalMl ?? this.goalMl,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'date': date.toIso8601String(),
-      'intakeMl': intakeMl,
-      'goalMl': goalMl,
-    };
-  }
-
-  factory HydrationHistoryEntry.fromJson(Map<String, dynamic> json) {
-    return HydrationHistoryEntry(
-      date: DateTime.parse(json['date'] as String),
-      intakeMl: json['intakeMl'] as int,
-      goalMl: json['goalMl'] as int,
-    );
-  }
 }
 
 class HydrationHistoryState extends ChangeNotifier {
   static final HydrationHistoryState instance =
       HydrationHistoryState._internal();
 
-  static const String _storageKey = 'hydration_history_entries';
-
   HydrationHistoryState._internal();
+
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
   final List<HydrationHistoryEntry> _entries = [];
   bool _isLoaded = false;
@@ -58,69 +40,64 @@ class HydrationHistoryState extends ChangeNotifier {
 
   bool get isLoaded => _isLoaded;
 
+  String _dateOnly(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
+  }
+
   Future<void> loadHistory() async {
     if (_isLoaded) return;
+    await refreshHistory();
+  }
 
-    final prefs = await SharedPreferences.getInstance();
-    final rawJson = prefs.getString(_storageKey);
+  Future<void> refreshHistory() async {
+    final rows = await _databaseHelper.getDailyIntakeRange(
+      startDate: '2000-01-01',
+      endDate: _dateOnly(DateTime.now()),
+    );
 
-    if (rawJson != null && rawJson.isNotEmpty) {
-      final decoded = jsonDecode(rawJson) as List<dynamic>;
-
-      _entries
-        ..clear()
-        ..addAll(
-          decoded.map(
-            (item) => HydrationHistoryEntry.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            ),
-          ),
-        );
-    }
+    _entries
+      ..clear()
+      ..addAll(
+        rows.map((row) {
+          return HydrationHistoryEntry(
+            date: DateTime.parse(row['intake_date'] as String),
+            intakeMl: row['intake_ml'] as int,
+            goalMl: row['goal_ml'] as int,
+          );
+        }),
+      );
 
     _isLoaded = true;
     notifyListeners();
   }
 
-  bool addOrUpdateEntry({
+  Future<bool> addOrUpdateEntry({
     required DateTime date,
     required int intakeMl,
     required int goalMl,
-  }) {
+  }) async {
     final normalizedDate = _normalizeDate(date);
+    final dateKey = _dateOnly(normalizedDate);
 
-    final index = _entries.indexWhere(
-      (entry) => _isSameDay(entry.date, normalizedDate),
-    );
+    final existing = entryForDate(normalizedDate);
 
-    final newEntry = HydrationHistoryEntry(
-      date: normalizedDate,
+    if (existing != null &&
+        existing.intakeMl == intakeMl &&
+        existing.goalMl == goalMl) {
+      return false;
+    }
+
+    await _databaseHelper.upsertDailyIntake(
+      intakeDate: dateKey,
       intakeMl: intakeMl,
       goalMl: goalMl,
     );
 
-    if (index >= 0) {
-      final existingEntry = _entries[index];
-
-      final isUnchanged =
-          existingEntry.intakeMl == intakeMl &&
-          existingEntry.goalMl == goalMl &&
-          _isSameDay(existingEntry.date, normalizedDate);
-
-      if (isUnchanged) {
-        return false;
-      }
-
-      _entries[index] = newEntry;
-      _saveHistory();
-      notifyListeners();
-      return true;
-    } else {
-      _entries.add(newEntry);
-      _saveHistory();
-      notifyListeners();
-      return true;
-    }
+    await refreshHistory();
+    return true;
   }
 
   HydrationHistoryEntry? entryForDate(DateTime date) {
@@ -172,18 +149,10 @@ class HydrationHistoryState extends ChangeNotifier {
     return filtered;
   }
 
-  void clearAll() {
+  Future<void> clearAll() async {
     _entries.clear();
-    _saveHistory();
+    _isLoaded = true;
     notifyListeners();
-  }
-
-  Future<void> _saveHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(
-      _entries.map((entry) => entry.toJson()).toList(),
-    );
-    await prefs.setString(_storageKey, encoded);
   }
 
   DateTime _normalizeDate(DateTime date) {

@@ -4,7 +4,16 @@ class WaterIntakeController extends ChangeNotifier {
   int goalMl;
   int currentMl;
 
-  WaterIntakeController({this.goalMl = 1500, this.currentMl = 650});
+  WaterIntakeController({this.goalMl = 1500, this.currentMl = 0});
+
+  void loadState({
+    required int goalMl,
+    required int currentMl,
+  }) {
+    this.goalMl = goalMl;
+    this.currentMl = currentMl < 0 ? 0 : currentMl;
+    notifyListeners();
+  }
 
   void addWater(int amount) {
     currentMl += amount;

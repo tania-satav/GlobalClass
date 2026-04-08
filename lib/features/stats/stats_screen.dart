@@ -69,7 +69,7 @@ class _StatsScreenState extends State<StatsScreen> {
       return 'Goal reached';
     }
     if (_remainingOrOverMl > 0) {
-      return '+${_remainingOrOverMl} ml';
+      return '+$_remainingOrOverMl ml';
     }
     return '${-_remainingOrOverMl} ml left';
   }
@@ -106,13 +106,13 @@ class _StatsScreenState extends State<StatsScreen> {
 
   Future<void> _initializeHistory() async {
     await _historyState.loadHistory();
-    _syncTodayIntoHistory();
+    await _syncTodayIntoHistory();
   }
 
-  void _syncTodayIntoHistory() {
+  Future<void> _syncTodayIntoHistory() async {
     if (!_historyState.isLoaded) return;
 
-    _historyState.addOrUpdateEntry(
+    await _historyState.addOrUpdateEntry(
       date: DateTime.now(),
       intakeMl: _todayIntakeMl,
       goalMl: _todayGoalMl,
