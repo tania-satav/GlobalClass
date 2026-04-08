@@ -24,11 +24,22 @@ class TodayHydrationState extends ChangeNotifier {
 
   Future<void> loadToday({required int goalMl}) async {
     final today = _dateOnly(DateTime.now());
+    final settings = await _databaseHelper.getSettings();
+    final lastOpenDate = settings?['last_open_date'] as String?;
 
-    await _databaseHelper.ensureDailyIntakeRow(
-      intakeDate: today,
-      goalMl: goalMl,
-    );
+    if (lastOpenDate == null || lastOpenDate != today) {
+      await _databaseHelper.ensureDailyIntakeRow(
+        intakeDate: today,
+        goalMl: goalMl,
+      );
+
+      await _databaseHelper.updateLastOpenDate(today);
+    } else {
+      await _databaseHelper.ensureDailyIntakeRow(
+        intakeDate: today,
+        goalMl: goalMl,
+      );
+    }
 
     final row = await _databaseHelper.getDailyIntakeByDate(today);
 
@@ -51,6 +62,8 @@ class TodayHydrationState extends ChangeNotifier {
       intakeMl: currentIntakeMl,
       goalMl: goalMl,
     );
+
+    await _databaseHelper.updateLastOpenDate(today);
 
     notifyListeners();
   }
