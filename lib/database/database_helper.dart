@@ -23,7 +23,7 @@ class DatabaseHelper {
 
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -37,7 +37,13 @@ class DatabaseHelper {
         activity_level TEXT NOT NULL DEFAULT 'Medium',
         unit TEXT NOT NULL DEFAULT 'ml',
         daily_goal_ml INTEGER NOT NULL DEFAULT 2100,
-        last_open_date TEXT
+        last_open_date TEXT,
+        reminders_enabled INTEGER NOT NULL DEFAULT 1,
+        reminder_frequency_hours INTEGER NOT NULL DEFAULT 2,
+        reminder_start_time TEXT NOT NULL DEFAULT '09:00',
+        reminder_end_time TEXT NOT NULL DEFAULT '22:00',
+        quiet_start_time TEXT NOT NULL DEFAULT '23:00',
+        quiet_end_time TEXT NOT NULL DEFAULT '07:00'
       )
     ''');
 
@@ -57,6 +63,12 @@ class DatabaseHelper {
       'unit': 'ml',
       'daily_goal_ml': 2100,
       'last_open_date': null,
+      'reminders_enabled': 1,
+      'reminder_frequency_hours': 2,
+      'reminder_start_time': '09:00',
+      'reminder_end_time': '22:00',
+      'quiet_start_time': '23:00',
+      'quiet_end_time': '07:00',
     });
   }
 
@@ -65,8 +77,29 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS water_entries');
       await db.execute('DROP TABLE IF EXISTS settings');
       await db.execute('DROP TABLE IF EXISTS daily_intake');
-
       await _createDB(db, newVersion);
+      return;
+    }
+
+    if (oldVersion < 3) {
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN reminders_enabled INTEGER NOT NULL DEFAULT 1",
+      );
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN reminder_frequency_hours INTEGER NOT NULL DEFAULT 2",
+      );
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN reminder_start_time TEXT NOT NULL DEFAULT '09:00'",
+      );
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN reminder_end_time TEXT NOT NULL DEFAULT '22:00'",
+      );
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN quiet_start_time TEXT NOT NULL DEFAULT '23:00'",
+      );
+      await db.execute(
+        "ALTER TABLE settings ADD COLUMN quiet_end_time TEXT NOT NULL DEFAULT '07:00'",
+      );
     }
   }
 
@@ -173,6 +206,12 @@ class DatabaseHelper {
     required String unit,
     required int dailyGoalMl,
     String? lastOpenDate,
+    int remindersEnabled = 1,
+    int reminderFrequencyHours = 2,
+    String reminderStartTime = '09:00',
+    String reminderEndTime = '22:00',
+    String quietStartTime = '23:00',
+    String quietEndTime = '07:00',
   }) async {
     final db = await database;
 
@@ -185,6 +224,12 @@ class DatabaseHelper {
         'unit': unit,
         'daily_goal_ml': dailyGoalMl,
         'last_open_date': lastOpenDate,
+        'reminders_enabled': remindersEnabled,
+        'reminder_frequency_hours': reminderFrequencyHours,
+        'reminder_start_time': reminderStartTime,
+        'reminder_end_time': reminderEndTime,
+        'quiet_start_time': quietStartTime,
+        'quiet_end_time': quietEndTime,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
