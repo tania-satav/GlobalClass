@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import 'reminder_settings.dart';
+import 'reminder_settings_storage.dart';
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -16,6 +18,43 @@ class _RemindersScreenState extends State<RemindersScreen> {
   TimeOfDay _endTime = const TimeOfDay(hour: 22, minute: 0);
   TimeOfDay _quietStart = const TimeOfDay(hour: 23, minute: 0);
   TimeOfDay _quietEnd = const TimeOfDay(hour: 7, minute: 0);
+
+  bool _isLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReminderSettings();
+  }
+
+  Future<void> _loadReminderSettings() async {
+    final settings = await ReminderSettingsStorage.load();
+
+    if (!mounted) return;
+
+    setState(() {
+      _remindersEnabled = settings.remindersEnabled;
+      _frequencyHours = settings.frequencyHours.toDouble();
+      _startTime = _parseTime(settings.startTime);
+      _endTime = _parseTime(settings.endTime);
+      _quietStart = _parseTime(settings.quietStart);
+      _quietEnd = _parseTime(settings.quietEnd);
+      _isLoaded = true;
+    });
+  }
+
+  TimeOfDay _parseTime(String value) {
+    final parts = value.split(':');
+    final hour = int.tryParse(parts[0]) ?? 0;
+    final minute = int.tryParse(parts[1]) ?? 0;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  String _toStorageTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
 
   String _formatTime(TimeOfDay time) {
     final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
@@ -40,12 +79,31 @@ class _RemindersScreenState extends State<RemindersScreen> {
     }
   }
 
-  void _savePreferences() {
+  Future<void> _savePreferences() async {
+    final settings = ReminderSettings(
+      remindersEnabled: _remindersEnabled,
+      frequencyHours: _frequencyHours.toInt(),
+      startTime: _toStorageTime(_startTime),
+      endTime: _toStorageTime(_endTime),
+      quietStart: _toStorageTime(_quietStart),
+      quietEnd: _toStorageTime(_quietEnd),
+    );
+
+    await ReminderSettingsStorage.save(settings);
+
+    if (!mounted) return;
     Navigator.pop(context, 'Reminder preferences saved');
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isLoaded) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFAEDFEA),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFAEDFEA),
       appBar: AppBar(
@@ -75,7 +133,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     children: [
                       SwitchListTile(
                         value: _remindersEnabled,
-                        activeColor: const Color(0xFF2F45FF),
+                        activeThumbColor: const Color(0xFF2F45FF),
                         contentPadding: EdgeInsets.zero,
                         title: const Text(
                           'Enable Reminders',

@@ -1,5 +1,6 @@
 import '../database/database_helper.dart';
 import '../features/profile/hydration_settings.dart';
+import '../features/profile/reminder_settings.dart';
 import '../features/stats/hydration_history_state.dart';
 
 class HydrationRepository {
@@ -53,6 +54,17 @@ class HydrationRepository {
       unit: settings.unit,
       dailyGoalMl: settings.dailyGoalMl,
       lastOpenDate: currentSettings?['last_open_date'] as String?,
+      remindersEnabled: (currentSettings?['reminders_enabled'] as int?) ?? 1,
+      reminderFrequencyHours:
+          (currentSettings?['reminder_frequency_hours'] as int?) ?? 2,
+      reminderStartTime:
+          (currentSettings?['reminder_start_time'] as String?) ?? '09:00',
+      reminderEndTime:
+          (currentSettings?['reminder_end_time'] as String?) ?? '22:00',
+      quietStartTime:
+          (currentSettings?['quiet_start_time'] as String?) ?? '23:00',
+      quietEndTime:
+          (currentSettings?['quiet_end_time'] as String?) ?? '07:00',
     );
   }
 
@@ -66,6 +78,50 @@ class HydrationRepository {
       unit: (currentSettings?['unit'] as String?) ?? 'ml',
       dailyGoalMl: value,
       lastOpenDate: currentSettings?['last_open_date'] as String?,
+      remindersEnabled: (currentSettings?['reminders_enabled'] as int?) ?? 1,
+      reminderFrequencyHours:
+          (currentSettings?['reminder_frequency_hours'] as int?) ?? 2,
+      reminderStartTime:
+          (currentSettings?['reminder_start_time'] as String?) ?? '09:00',
+      reminderEndTime:
+          (currentSettings?['reminder_end_time'] as String?) ?? '22:00',
+      quietStartTime:
+          (currentSettings?['quiet_start_time'] as String?) ?? '23:00',
+      quietEndTime:
+          (currentSettings?['quiet_end_time'] as String?) ?? '07:00',
+    );
+  }
+
+  Future<ReminderSettings> loadReminderSettings() async {
+    final settingsRow = await _databaseHelper.getSettings();
+
+    return ReminderSettings(
+      remindersEnabled: ((settingsRow?['reminders_enabled'] as int?) ?? 1) == 1,
+      frequencyHours:
+          (settingsRow?['reminder_frequency_hours'] as int?) ?? 2,
+      startTime: (settingsRow?['reminder_start_time'] as String?) ?? '09:00',
+      endTime: (settingsRow?['reminder_end_time'] as String?) ?? '22:00',
+      quietStart: (settingsRow?['quiet_start_time'] as String?) ?? '23:00',
+      quietEnd: (settingsRow?['quiet_end_time'] as String?) ?? '07:00',
+    );
+  }
+
+  Future<void> saveReminderSettings(ReminderSettings reminderSettings) async {
+    final currentSettings = await _databaseHelper.getSettings();
+
+    await _databaseHelper.upsertSettings(
+      weightKg: (currentSettings?['weight_kg'] as num?)?.toDouble() ?? 70.0,
+      activityLevel:
+          (currentSettings?['activity_level'] as String?) ?? 'Medium',
+      unit: (currentSettings?['unit'] as String?) ?? 'ml',
+      dailyGoalMl: (currentSettings?['daily_goal_ml'] as int?) ?? 2100,
+      lastOpenDate: currentSettings?['last_open_date'] as String?,
+      remindersEnabled: reminderSettings.remindersEnabled ? 1 : 0,
+      reminderFrequencyHours: reminderSettings.frequencyHours,
+      reminderStartTime: reminderSettings.startTime,
+      reminderEndTime: reminderSettings.endTime,
+      quietStartTime: reminderSettings.quietStart,
+      quietEndTime: reminderSettings.quietEnd,
     );
   }
 
