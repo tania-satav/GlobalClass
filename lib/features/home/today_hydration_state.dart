@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../database/database_helper.dart';
+import '../../repositories/hydration_repository.dart';
 
 class TodayHydrationState extends ChangeNotifier {
   static final TodayHydrationState instance = TodayHydrationState._internal();
@@ -8,40 +8,28 @@ class TodayHydrationState extends ChangeNotifier {
 
   TodayHydrationState._internal();
 
-  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  final HydrationRepository _repository = HydrationRepository.instance;
 
   int currentIntakeMl = 0;
   bool _isLoaded = false;
 
   bool get isLoaded => _isLoaded;
 
-  String _dateOnly(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
-  }
-
   Future<void> loadToday({required int goalMl}) async {
-    final today = _dateOnly(DateTime.now());
-    final settings = await _databaseHelper.getSettings();
-    final lastOpenDate = settings?['last_open_date'] as String?;
+    final today = DateTime.now();
+    final todayKey = _repository.dateOnly(today);
+    final lastOpenDate = await _repository.getLastOpenDate();
 
-    if (lastOpenDate == null || lastOpenDate != today) {
-      await _databaseHelper.ensureDailyIntakeRow(
-        intakeDate: today,
-        goalMl: goalMl,
-      );
+    await _repository.ensureTodayRow(
+      date: today,
+      goalMl: goalMl,
+    );
 
-      await _databaseHelper.updateLastOpenDate(today);
-    } else {
-      await _databaseHelper.ensureDailyIntakeRow(
-        intakeDate: today,
-        goalMl: goalMl,
-      );
+    if (lastOpenDate == null || lastOpenDate != todayKey) {
+      await _repository.updateLastOpenDate(today);
     }
 
-    final row = await _databaseHelper.getDailyIntakeByDate(today);
+    final row = await _repository.getDailyRow(today);
 
     currentIntakeMl = (row?['intake_ml'] as int?) ?? 0;
     _isLoaded = true;
@@ -53,17 +41,17 @@ class TodayHydrationState extends ChangeNotifier {
     required int goalMl,
   }) async {
     final safeValue = value < 0 ? 0 : value;
-    final today = _dateOnly(DateTime.now());
+    final today = DateTime.now();
 
     currentIntakeMl = safeValue;
 
-    await _databaseHelper.upsertDailyIntake(
-      intakeDate: today,
+    await _repository.saveDailyIntake(
+      date: today,
       intakeMl: currentIntakeMl,
       goalMl: goalMl,
     );
 
-    await _databaseHelper.updateLastOpenDate(today);
+    await _repository.updateLastOpenDate(today);
 
     notifyListeners();
   }

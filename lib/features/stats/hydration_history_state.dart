@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../../database/database_helper.dart';
+import '../../repositories/hydration_repository.dart';
 
 class HydrationHistoryEntry {
   final DateTime date;
@@ -27,7 +27,7 @@ class HydrationHistoryState extends ChangeNotifier {
 
   HydrationHistoryState._internal();
 
-  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  final HydrationRepository _repository = HydrationRepository.instance;
 
   final List<HydrationHistoryEntry> _entries = [];
   bool _isLoaded = false;
@@ -40,35 +40,17 @@ class HydrationHistoryState extends ChangeNotifier {
 
   bool get isLoaded => _isLoaded;
 
-  String _dateOnly(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
-  }
-
   Future<void> loadHistory() async {
     if (_isLoaded) return;
     await refreshHistory();
   }
 
   Future<void> refreshHistory() async {
-    final rows = await _databaseHelper.getDailyIntakeRange(
-      startDate: '2000-01-01',
-      endDate: _dateOnly(DateTime.now()),
-    );
+    final loadedEntries = await _repository.loadHistoryEntries();
 
     _entries
       ..clear()
-      ..addAll(
-        rows.map((row) {
-          return HydrationHistoryEntry(
-            date: DateTime.parse(row['intake_date'] as String),
-            intakeMl: row['intake_ml'] as int,
-            goalMl: row['goal_ml'] as int,
-          );
-        }),
-      );
+      ..addAll(loadedEntries);
 
     _isLoaded = true;
     notifyListeners();
@@ -79,9 +61,7 @@ class HydrationHistoryState extends ChangeNotifier {
     required int intakeMl,
     required int goalMl,
   }) async {
-    final normalizedDate = _normalizeDate(date);
-    final dateKey = _dateOnly(normalizedDate);
-
+    final normalizedDate = _repository.normalizeDate(date);
     final existing = entryForDate(normalizedDate);
 
     if (existing != null &&
@@ -90,8 +70,8 @@ class HydrationHistoryState extends ChangeNotifier {
       return false;
     }
 
-    await _databaseHelper.upsertDailyIntake(
-      intakeDate: dateKey,
+    await _repository.saveDailyIntake(
+      date: normalizedDate,
       intakeMl: intakeMl,
       goalMl: goalMl,
     );
@@ -101,7 +81,7 @@ class HydrationHistoryState extends ChangeNotifier {
   }
 
   HydrationHistoryEntry? entryForDate(DateTime date) {
-    final normalizedDate = _normalizeDate(date);
+    final normalizedDate = _repository.normalizeDate(date);
 
     try {
       return _entries.firstWhere(
@@ -113,11 +93,11 @@ class HydrationHistoryState extends ChangeNotifier {
   }
 
   List<HydrationHistoryEntry> entriesForLast7Days() {
-    final today = _normalizeDate(DateTime.now());
+    final today = _repository.normalizeDate(DateTime.now());
     final cutoff = today.subtract(const Duration(days: 6));
 
     final filtered = _entries.where((entry) {
-      final entryDate = _normalizeDate(entry.date);
+      final entryDate = _repository.normalizeDate(entry.date);
       return !entryDate.isBefore(cutoff) && !entryDate.isAfter(today);
     }).toList();
 
@@ -137,11 +117,11 @@ class HydrationHistoryState extends ChangeNotifier {
   }
 
   List<HydrationHistoryEntry> entriesForPast12Months() {
-    final today = _normalizeDate(DateTime.now());
+    final today = _repository.normalizeDate(DateTime.now());
     final cutoff = DateTime(today.year - 1, today.month, today.day);
 
     final filtered = _entries.where((entry) {
-      final entryDate = _normalizeDate(entry.date);
+      final entryDate = _repository.normalizeDate(entry.date);
       return !entryDate.isBefore(cutoff) && !entryDate.isAfter(today);
     }).toList();
 
@@ -153,10 +133,6 @@ class HydrationHistoryState extends ChangeNotifier {
     _entries.clear();
     _isLoaded = true;
     notifyListeners();
-  }
-
-  DateTime _normalizeDate(DateTime date) {
-    return DateTime(date.year, date.month, date.day);
   }
 
   bool _isSameDay(DateTime first, DateTime second) {
