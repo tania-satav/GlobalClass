@@ -48,9 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
     await todayHydrationState.loadToday(goalMl: settings.dailyGoalMl);
 
     controller.loadState(
-  goalMl: settings.dailyGoalMl,
-  currentMl: todayHydrationState.currentIntakeMl,
-);
+      goalMl: settings.dailyGoalMl,
+      currentMl: todayHydrationState.currentIntakeMl,
+    );
   }
 
   void _syncGoalFromSettings() {
@@ -75,6 +75,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _resetWater() async {
     controller.resetWater();
+  }
+
+  void _handleNavTap(int index) {
+    if (index == 1) return;
+
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+      );
+      return;
+    }
+
+    if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StreaksScreen()),
+      );
+      return;
+    }
+
+    if (index == 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Garden screen is not connected yet.')),
+      );
+      return;
+    }
+
+    if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StatsScreen()),
+      );
+      return;
+    }
   }
 
   @override
@@ -202,35 +237,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           bottomNavigationBar: HomeBottomNav(
-            currentIndex: 0,
-            onTap: (index) {
-              if (index == 0) return;
-
-              if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const StreaksScreen(),
-                  ),
-                );
-              }
-
-              if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const StatsScreen()),
-                );
-              }
-
-              if (index == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                );
-              }
-            },
+            currentIndex: 1,
+            onTap: _handleNavTap,
           ),
         );
       },

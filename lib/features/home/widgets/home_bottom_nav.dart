@@ -23,6 +23,11 @@ class HomeBottomNav extends StatelessWidget {
       showUnselectedLabels: false,
       items: const [
         BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          activeIcon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
           activeIcon: Icon(Icons.home),
           label: 'Home',
@@ -41,11 +46,6 @@ class HomeBottomNav extends StatelessWidget {
           icon: Icon(Icons.bar_chart_outlined),
           activeIcon: Icon(Icons.bar_chart),
           label: 'Stats',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profile',
         ),
       ],
     );

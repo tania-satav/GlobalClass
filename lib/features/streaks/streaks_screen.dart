@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import '../profile/profile_screen.dart';
 import '../stats/hydration_history_state.dart';
+import '../stats/stats_screen.dart';
 
 class StreaksScreen extends StatefulWidget {
   const StreaksScreen({super.key});
@@ -82,6 +84,41 @@ class _StreaksScreenState extends State<StreaksScreen> {
     });
   }
 
+  void _handleNavTap(int index) {
+    if (index == 2) return;
+
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+      );
+      return;
+    }
+
+    if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+      return;
+    }
+
+    if (index == 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Garden screen is not connected yet.')),
+      );
+      return;
+    }
+
+    if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StatsScreen()),
+      );
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -121,7 +158,7 @@ class _StreaksScreenState extends State<StreaksScreen> {
                       vertical: 24,
                     ),
                     decoration: BoxDecoration(
-                     color: Colors.white.withValues(alpha: 0.95),
+                      color: Colors.white.withValues(alpha: 0.95),
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Column(
@@ -168,7 +205,14 @@ class _StreaksScreenState extends State<StreaksScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HomeScreen(),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0F86C8),
                               foregroundColor: Colors.white,
@@ -198,17 +242,8 @@ class _StreaksScreenState extends State<StreaksScreen> {
             ),
           ),
           bottomNavigationBar: HomeBottomNav(
-            currentIndex: 1,
-            onTap: (index) {
-              if (index == 1) return;
-
-              if (index == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                );
-              }
-            },
+            currentIndex: 2,
+            onTap: _handleNavTap,
           ),
         );
       },
@@ -240,11 +275,7 @@ class _DayDrop extends StatelessWidget {
 
     return Column(
       children: [
-        Icon(
-          Icons.water_drop,
-          size: 34,
-          color: color,
-        ),
+        Icon(Icons.water_drop, size: 34, color: color),
         const SizedBox(height: 4),
         Text(
           label,

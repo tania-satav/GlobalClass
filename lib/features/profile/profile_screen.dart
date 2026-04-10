@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import '../stats/stats_screen.dart';
+import '../streaks/streaks_screen.dart';
 import 'account_screen.dart';
 import 'personalisation_screen.dart';
 import 'reminders_screen.dart';
@@ -25,6 +27,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(result)));
+    }
+  }
+
+  void _handleNavTap(int index) {
+    if (index == 0) return;
+
+    if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+      return;
+    }
+
+    if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StreaksScreen()),
+      );
+      return;
+    }
+
+    if (index == 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Garden screen is not connected yet.')),
+      );
+      return;
+    }
+
+    if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StatsScreen()),
+      );
+      return;
     }
   }
 
@@ -115,23 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: HomeBottomNav(
-        currentIndex: 4,
-        onTap: (index) {
-          if (index == 4) return;
-
-          if (index == 0) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-            return;
-          }
-
-          Navigator.pop(context);
-        },
-      ),
+      bottomNavigationBar: HomeBottomNav(currentIndex: 0, onTap: _handleNavTap),
     );
   }
 }

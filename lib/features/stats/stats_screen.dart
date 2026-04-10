@@ -3,6 +3,8 @@ import '../home/home_screen.dart';
 import '../home/today_hydration_state.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import '../profile/hydration_settings.dart';
+import '../profile/profile_screen.dart';
+import '../streaks/streaks_screen.dart';
 import 'hydration_history_state.dart';
 
 class StatsScreen extends StatefulWidget {
@@ -117,6 +119,41 @@ class _StatsScreenState extends State<StatsScreen> {
       intakeMl: _todayIntakeMl,
       goalMl: _todayGoalMl,
     );
+  }
+
+  void _handleNavTap(int index) {
+    if (index == 4) return;
+
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+      );
+      return;
+    }
+
+    if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+      return;
+    }
+
+    if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StreaksScreen()),
+      );
+      return;
+    }
+
+    if (index == 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Garden screen is not connected yet.')),
+      );
+      return;
+    }
   }
 
   String _formatEntryLabel(DateTime date) {
@@ -406,21 +443,8 @@ class _StatsScreenState extends State<StatsScreen> {
             ),
           ),
           bottomNavigationBar: HomeBottomNav(
-            currentIndex: 3,
-            onTap: (index) {
-              if (index == 3) return;
-
-              if (index == 0) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  (route) => false,
-                );
-                return;
-              }
-
-              Navigator.pop(context);
-            },
+            currentIndex: 4,
+            onTap: _handleNavTap,
           ),
         );
       },
