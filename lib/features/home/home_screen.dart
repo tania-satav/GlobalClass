@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
@@ -139,10 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 0,
             actions: [
               IconButton(
-                icon: const Icon(Icons.logout, color: Colors.white),
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                },
+                icon: const Icon(Icons.notifications_none, color: Colors.white),
+                onPressed: () {},
               ),
             ],
           ),
