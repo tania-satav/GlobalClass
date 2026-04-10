@@ -141,6 +141,48 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
     );
   }
 
+  void _showRecommendedIntakeInfo() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('How recommended intake is calculated'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Recommended intake is based on your body weight and activity level.',
+              ),
+              SizedBox(height: 12),
+              Text('Base formula:'),
+              SizedBox(height: 4),
+              Text('30 ml of water per kg of body weight'),
+              SizedBox(height: 12),
+              Text('Activity adjustment:'),
+              SizedBox(height: 4),
+              Text('Low: +0 ml'),
+              Text('Medium: +300 ml'),
+              Text('High: +700 ml'),
+              SizedBox(height: 12),
+              Text('Example:'),
+              SizedBox(height: 4),
+              Text('If you weigh 70 kg and choose Medium activity:'),
+              Text('70 × 30 = 2100 ml'),
+              Text('2100 ml + 300 ml = 2400 ml recommended daily intake'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Got it'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _savePreferences() async {
     final double parsedWeight =
         double.tryParse(_weightController.text.trim()) ?? _settings.weightKg;
@@ -327,13 +369,32 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Recommended goal: ${_formatGoal(recommendedGoalMl)}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1D3557),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Recommended goal: ${_formatGoal(recommendedGoalMl)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: _showRecommendedIntakeInfo,
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(2),
+                              child: Icon(
+                                Icons.help_outline,
+                                size: 18,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 6),
                       const Text(
