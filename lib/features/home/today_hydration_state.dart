@@ -11,10 +11,17 @@ class TodayHydrationState extends ChangeNotifier {
   final HydrationRepository _repository = HydrationRepository.instance;
 
   int currentIntakeMl = 0;
-  bool _isLoaded = false;
+  int currentFlowerVariant = 0;
 
+  bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
 
+  // 🌸 rotation system (bag of flowers)
+  List<int> _flowerPool = [0, 1, 2, 3];
+
+  // -------------------------------
+  // LOAD STATE
+  // -------------------------------
   Future<void> loadToday({required int goalMl}) async {
     final today = DateTime.now();
     final todayKey = _repository.dateOnly(today);
@@ -32,10 +39,14 @@ class TodayHydrationState extends ChangeNotifier {
     final row = await _repository.getDailyRow(today);
 
     currentIntakeMl = (row?['intake_ml'] as int?) ?? 0;
+
     _isLoaded = true;
     notifyListeners();
   }
 
+  // -------------------------------
+  // SET INTAKE (CORE LOGIC)
+  // -------------------------------
   Future<void> setCurrentIntake({
     required int value,
     required int goalMl,
@@ -43,6 +54,7 @@ class TodayHydrationState extends ChangeNotifier {
     final safeValue = value < 0 ? 0 : value;
     final today = DateTime.now();
 
+    final previousMl = currentIntakeMl;
     currentIntakeMl = safeValue;
 
     await _repository.saveDailyIntake(
@@ -53,9 +65,17 @@ class TodayHydrationState extends ChangeNotifier {
 
     await _repository.updateLastOpenDate(today);
 
+    // 🌸 trigger ONLY when crossing goal
+    if (previousMl < goalMl && currentIntakeMl >= goalMl) {
+      _generateNextFlowerVariant();
+    }
+
     notifyListeners();
   }
 
+  // -------------------------------
+  // WATER ACTIONS
+  // -------------------------------
   Future<void> addWater({
     required int amount,
     required int goalMl,
@@ -78,5 +98,20 @@ class TodayHydrationState extends ChangeNotifier {
 
   Future<void> reset({required int goalMl}) async {
     await setCurrentIntake(value: 0, goalMl: goalMl);
+  }
+
+  // -------------------------------
+  // 🌸 FLOWER ROTATION SYSTEM
+  // -------------------------------
+  void _generateNextFlowerVariant() {
+    // refill pool if empty
+    if (_flowerPool.isEmpty) {
+      _flowerPool = [0, 1, 2]..shuffle();
+    }
+
+    // take next flower from pool
+    currentFlowerVariant = _flowerPool.removeLast();
+
+    notifyListeners();
   }
 }

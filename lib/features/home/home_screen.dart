@@ -8,6 +8,7 @@ import 'water_intake_controller.dart';
 import 'widgets/did_you_know_card.dart';
 import 'widgets/home_bottom_nav.dart';
 import 'widgets/intake_progress_card.dart';
+import '../garden/presentation/garden_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -96,14 +97,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (index == 3) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const GardenScreen(),
+    ),
+  );
+  return;
+}
+    /*if (index == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Garden screen is not connected yet.')),
       );
       return;
-    }
+    }*/
 
     if (index == 4) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const StatsScreen()),
       );
