@@ -69,7 +69,7 @@ class _GardenScreenState extends State<GardenScreen> {
     return 4;                 // full bloom
   }
 
-  // 🌱 MESSAGE (NOW MATCHES STAGES EXACTLY)
+  // MESSAGE (NOW MATCHES STAGES EXACTLY)
   String _getGrowthMessage(int ml) {
     switch (_getGrowthStage(ml)) {
       case 0:

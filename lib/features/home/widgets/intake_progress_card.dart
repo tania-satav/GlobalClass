@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'wave_clipper.dart';
 
-class IntakeProgressCard extends StatelessWidget {
+class IntakeProgressCard extends StatefulWidget {
   final int goalMl;
   final int currentMl;
 
@@ -10,20 +12,45 @@ class IntakeProgressCard extends StatelessWidget {
     required this.currentMl,
   });
 
+  @override
+  State<IntakeProgressCard> createState() =>
+      _IntakeProgressCardState();
+}
+
+class _IntakeProgressCardState extends State<IntakeProgressCard> {
+  double wavePhase = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Timer.periodic(
+      const Duration(milliseconds: 60),
+      (_) {
+        setState(() {
+          wavePhase += 0.2;
+        });
+      },
+    );
+  }
+
   String _formatLabel(int value) {
     return '${value}ml';
   }
 
   @override
   Widget build(BuildContext context) {
-    final double progress = goalMl == 0
+    final double progress = widget.goalMl == 0
         ? 0
-        : (currentMl / goalMl).clamp(0.0, 1.0);
+        : (widget.currentMl / widget.goalMl)
+            .clamp(0.0, 1.0);
 
     final int topLabel = 0;
-    final int rightLabel = (goalMl / 3).round();
-    final int bottomLabel = ((goalMl * 2) / 3).round();
-    final int leftLabel = goalMl;
+    final int rightLabel =
+        (widget.goalMl / 3).round();
+    final int bottomLabel =
+        ((widget.goalMl * 2) / 3).round();
+    final int leftLabel = widget.goalMl;
 
     return SizedBox(
       width: 280,
@@ -34,29 +61,55 @@ class IntakeProgressCard extends StatelessWidget {
           SizedBox(
             width: 260,
             height: 260,
-            child: CircularProgressIndicator(
-              value: progress,
-              strokeWidth: 26,
-              backgroundColor: const Color(0xFF8ED0E0),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2F45FF)),
+            child: TweenAnimationBuilder<double>(
+              duration:
+                  const Duration(milliseconds: 600),
+              tween: Tween<double>(
+                begin: 0,
+                end: progress,
+              ),
+              builder: (context, value, child) {
+                return CircularProgressIndicator(
+                  value: value,
+                  strokeWidth: 26,
+                  backgroundColor:
+                      const Color(0xFF8ED0E0),
+                  valueColor:
+                      const AlwaysStoppedAnimation(
+                    Color(0xFF0A7DAC), 
+                  ),
+                );
+              },
             ),
           ),
 
           Positioned(
             top: 18,
-            child: Text(_formatLabel(topLabel), style: _labelStyle),
+            child: Text(
+              _formatLabel(topLabel),
+              style: _labelStyle,
+            ),
           ),
           Positioned(
             right: 10,
-            child: Text(_formatLabel(rightLabel), style: _labelStyle),
+            child: Text(
+              _formatLabel(rightLabel),
+              style: _labelStyle,
+            ),
           ),
           Positioned(
             bottom: 12,
-            child: Text(_formatLabel(bottomLabel), style: _labelStyle),
+            child: Text(
+              _formatLabel(bottomLabel),
+              style: _labelStyle,
+            ),
           ),
           Positioned(
             left: 8,
-            child: Text(_formatLabel(leftLabel), style: _labelStyle),
+            child: Text(
+              _formatLabel(leftLabel),
+              style: _labelStyle,
+            ),
           ),
 
           Container(
@@ -64,33 +117,68 @@ class IntakeProgressCard extends StatelessWidget {
             height: 170,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(120),
+              borderRadius:
+                  BorderRadius.circular(120),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color:
+                      Colors.black.withOpacity(0.08),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.local_florist,
-                  size: 56,
-                  color: Color(0xFF2E7D32),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '$currentMl / $goalMl ml',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1D3557),
+            child: ClipRRect(
+              borderRadius:
+                  BorderRadius.circular(120),
+              child: Stack(
+                children: [
+                  AnimatedBuilder(
+                    animation:
+                        Listenable.merge([]),
+                    builder: (context, _) {
+                      return ClipPath(
+                        clipper: WaveClipper(
+                          progress: progress,
+                          wavePhase: wavePhase,
+                        ),
+                        child: Container(
+                          color:
+                              const Color(0xFF6EC6FF),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ],
+
+                  Center(
+                    child: Column(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center,
+                      children: [
+                    Image.asset(
+                      'assets/plants/mainflower.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
+                        const SizedBox(
+                            height: 10),
+                        Text(
+                          '${widget.currentMl} / ${widget.goalMl} ml',
+                          style:
+                              const TextStyle(
+                            fontSize: 16,
+                            fontWeight:
+                                FontWeight.w800,
+                            color:
+                                Color(0xFF1D3557),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -27,11 +27,12 @@ class DidYouKnowCard extends StatelessWidget {
               color: const Color(0xFFEAF7FF),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.water_drop,
-              size: 42,
-              color: Color(0xFF3AA3FF),
-            ),
+            child: Image.asset(
+                      'assets/icons/watericonwhite.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
           ),
           const SizedBox(width: 12),
           const Expanded(

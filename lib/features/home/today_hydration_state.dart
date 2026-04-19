@@ -16,7 +16,7 @@ class TodayHydrationState extends ChangeNotifier {
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
 
-  // 🌸 rotation system (bag of flowers)
+  // 
   List<int> _flowerPool = [0, 1, 2, 3];
 
   // -------------------------------
@@ -65,7 +65,7 @@ class TodayHydrationState extends ChangeNotifier {
 
     await _repository.updateLastOpenDate(today);
 
-    // 🌸 trigger ONLY when crossing goal
+    //
     if (previousMl < goalMl && currentIntakeMl >= goalMl) {
       _generateNextFlowerVariant();
     }
@@ -101,7 +101,7 @@ class TodayHydrationState extends ChangeNotifier {
   }
 
   // -------------------------------
-  // 🌸 FLOWER ROTATION SYSTEM
+  //FLOWER ROTATION SYSTEM
   // -------------------------------
   void _generateNextFlowerVariant() {
     // refill pool if empty

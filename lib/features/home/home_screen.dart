@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton(
                         onPressed: _resetWater,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2F45FF),
+                          backgroundColor:  Color(0xFF0A7DAC), 
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 18,

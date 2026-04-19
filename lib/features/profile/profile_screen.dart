@@ -6,6 +6,7 @@ import '../streaks/streaks_screen.dart';
 import 'account_screen.dart';
 import 'personalisation_screen.dart';
 import 'reminders_screen.dart';
+import '../garden/presentation/garden_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -49,12 +50,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    if (index == 3) {
+   if (index == 3) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const GardenScreen(),
+    ),
+  );
+  return;
+}
+    /*if (index == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Garden screen is not connected yet.')),
       );
       return;
-    }
+    }*/
 
     if (index == 4) {
       Navigator.pushReplacement(

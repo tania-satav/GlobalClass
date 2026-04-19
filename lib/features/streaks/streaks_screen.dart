@@ -4,6 +4,7 @@ import '../home/widgets/home_bottom_nav.dart';
 import '../profile/profile_screen.dart';
 import '../stats/hydration_history_state.dart';
 import '../stats/stats_screen.dart';
+import '../garden/presentation/garden_screen.dart';
 
 class StreaksScreen extends StatefulWidget {
   const StreaksScreen({super.key});
@@ -103,13 +104,21 @@ class _StreaksScreenState extends State<StreaksScreen> {
       return;
     }
 
-    if (index == 3) {
+   if (index == 3) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const GardenScreen(),
+    ),
+  );
+  return;
+}
+    /*if (index == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Garden screen is not connected yet.')),
       );
       return;
-    }
-
+    }*/
     if (index == 4) {
       Navigator.pushReplacement(
         context,
@@ -158,17 +167,18 @@ class _StreaksScreenState extends State<StreaksScreen> {
                       vertical: 24,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.95),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Column(
                       children: [
                         const Spacer(),
-                        const Icon(
-                          Icons.water_drop,
-                          size: 130,
-                          color: Color(0xFF6ED3E8),
-                        ),
+                    Image.asset(
+                      'assets/icons/watericonwhite.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
                         const SizedBox(height: 16),
                         Text(
                           '$streak DAY STREAK',
@@ -214,7 +224,7 @@ class _StreaksScreenState extends State<StreaksScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF0F86C8),
+                              backgroundColor: const Color(0xFF0A7DAC),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(

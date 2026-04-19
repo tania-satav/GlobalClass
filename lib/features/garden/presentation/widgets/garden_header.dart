@@ -8,7 +8,7 @@ class GardenHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 16),
-      color: const Color.fromARGB(255, 26, 99, 177), 
+      color: const Color(0xFF0A7DAC), 
       child: const Center(
         child: Text(
           'YOUR GARDEN',

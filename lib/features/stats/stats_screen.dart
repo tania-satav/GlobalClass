@@ -6,6 +6,7 @@ import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
 import '../streaks/streaks_screen.dart';
 import 'hydration_history_state.dart';
+import '../garden/presentation/garden_screen.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -139,14 +140,21 @@ class _StatsScreenState extends State<StatsScreen> {
       );
       return;
     }
-
-    if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const StreaksScreen()),
+   if (index == 3) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const GardenScreen(),
+    ),
+  );
+  return;
+}
+    /*if (index == 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Garden screen is not connected yet.')),
       );
       return;
-    }
+    }*/
 
     if (index == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
