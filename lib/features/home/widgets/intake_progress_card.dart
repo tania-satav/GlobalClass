@@ -144,7 +144,7 @@ class _IntakeProgressCardState extends State<IntakeProgressCard> {
                         ),
                         child: Container(
                           color:
-                              const Color(0xFF6EC6FF),
+                              const Color(0xFF8ACEFF),
                         ),
                       );
                     },
