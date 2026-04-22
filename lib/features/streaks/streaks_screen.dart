@@ -130,7 +130,7 @@ class _StreaksScreenState extends State<StreaksScreen> {
       builder: (context, _) {
         if (!_historyState.isLoaded) {
           return const Scaffold(
-            backgroundColor: Color(0xFFAEDFEA),
+            backgroundColor: Color(0xFFD6F1F7),
             body: Center(child: CircularProgressIndicator()),
           );
         }
@@ -139,118 +139,166 @@ class _StreaksScreenState extends State<StreaksScreen> {
         final weekStatuses = _buildCurrentWeekStatuses();
 
         return Scaffold(
-          backgroundColor: const Color(0xFFAEDFEA),
-          body: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                const Text(
-                  'KeepMe Hydrated',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+  backgroundColor: const Color(0xFFD6F1F7),
+
+  bottomNavigationBar: HomeBottomNav(
+    currentIndex: 2,
+    onTap: _handleNavTap,
+  ),
+
+  body: Container(
+    decoration: const BoxDecoration(
+      color: Color(0xFFD6F1F7),
+      image: DecorationImage(
+        image: AssetImage('assets/images/wallpaper3.png'),
+        fit: BoxFit.cover,
+      ),
+    ),
+
+    child: SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 18),
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(
+      vertical: 16,
+      horizontal: 20,
+    ),
+    decoration: BoxDecoration(
+      color: Color(0xFF0A7DAC),
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.08),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: const Text(
+      'KeepMe Hydrated',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        color: Color.fromARGB(255, 255, 255, 255),
+        letterSpacing: 0.5,
+      ),
+    ),
+  ),
+),
+
+          const SizedBox(height: 24),
+
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 24,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                children: [
+                  const Spacer(),
+
+                  Image.asset(
+                    'assets/icons/watericonwhite.png',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
                   ),
-                ),
-                const SizedBox(height: 24),
-                Expanded(
-                  child: Container(
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    '$streak DAY STREAK',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF6ED3E8),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    streak > 0
+                        ? 'You have hit your hydration goal for $streak day${streak == 1 ? '' : 's'} in a row.'
+                        : 'Hit your hydration goal today to start a new streak.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5E5E5E),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: weekStatuses.map((day) {
+                      return _DayDrop(
+                        label: day.label,
+                        selected: day.isToday,
+                        completed: day.goalHit,
+                      );
+                    }).toList(),
+                  ),
+
+                  const Spacer(),
+
+                  SizedBox(
                     width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 18),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        const Spacer(),
-                    Image.asset(
-                      'assets/icons/watericonwhite.png',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                        const SizedBox(height: 16),
-                        Text(
-                          '$streak DAY STREAK',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF6ED3E8),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
                           ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0A7DAC),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          streak > 0
-                              ? 'You have hit your hydration goal for $streak day${streak == 1 ? '' : 's'} in a row.'
-                              : 'Hit your hydration goal today to start a new streak.',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF5E5E5E),
-                          ),
+                      ),
+                      child: Text(
+                        streak > 0
+                            ? 'KEEP YOUR STREAK GOING\nLOG WATER TODAY'
+                            : 'LOG WATER TO START\nYOUR STREAK',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
                         ),
-                        const SizedBox(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: weekStatuses.map((day) {
-                            return _DayDrop(
-                              label: day.label,
-                              selected: day.isToday,
-                              completed: day.goalHit,
-                            );
-                          }).toList(),
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HomeScreen(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF0A7DAC),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: Text(
-                              streak > 0
-                                  ? 'KEEP YOUR STREAK GOING\nLOG WATER TODAY'
-                                  : 'LOG WATER TO START\nYOUR STREAK',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
-              ],
+                ],
+              ),
             ),
           ),
-          bottomNavigationBar: HomeBottomNav(
-            currentIndex: 2,
-            onTap: _handleNavTap,
-          ),
-        );
+
+          const SizedBox(height: 18),
+        ],
+      ),
+    ),
+  ),
+);
       },
     );
   }

@@ -17,12 +17,10 @@ class GardenScreen extends StatefulWidget {
   const GardenScreen({super.key});
 
   @override
-  State<GardenScreen> createState() =>
-      _GardenScreenState();
+  State<GardenScreen> createState() => _GardenScreenState();
 }
 
-class _GardenScreenState
-    extends State<GardenScreen> {
+class _GardenScreenState extends State<GardenScreen> {
   late final GardenController controller;
 
   @override
@@ -44,19 +42,13 @@ class _GardenScreenState
     super.dispose();
   }
 
-  void _handleNavTap(
-      BuildContext context,
-      int index,
-  ) {
+  void _handleNavTap(BuildContext context, int index) {
     if (index == 3) return;
 
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const ProfileScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const ProfileScreen()),
       );
       return;
     }
@@ -64,10 +56,7 @@ class _GardenScreenState
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
       return;
     }
@@ -75,10 +64,7 @@ class _GardenScreenState
     if (index == 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const StreaksScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const StreaksScreen()),
       );
       return;
     }
@@ -86,10 +72,7 @@ class _GardenScreenState
     if (index == 4) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const StatsScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const StatsScreen()),
       );
     }
   }
@@ -98,74 +81,68 @@ class _GardenScreenState
   Widget build(BuildContext context) {
     if (controller.isLoading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFAEDFEA),
+      backgroundColor: const Color(0xFFD6F1F7),
 
       appBar: AppBar(
-        backgroundColor:
-            const Color(0xFFAEDFEA),
+        backgroundColor: Color(0xFFD6F1F7),
         elevation: 0,
-        automaticallyImplyLeading:
-            false,
+        automaticallyImplyLeading: false,
       ),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            const GardenHeader(),
+      // 🌿 BACKGROUND IMAGE WRAPPER
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/wallpaper3.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
 
-            const SizedBox(height: 10),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const GardenHeader(),
+              const SizedBox(height: 10),
+              const GrowableFlowersBar(),
+              const SizedBox(height: 20),
 
-            const GrowableFlowersBar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
 
-            const SizedBox(height: 20),
-
-            Expanded(
-              child:
-                  SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                        height: 10),
-
-                    // 🌿 ISLAND
-                    SizedBox(
-                      height: 350,
-                      child: GardenIsland(
-                        days:
-                            controller.days,
+                      // 🌿 ISLAND
+                      SizedBox(
+                        height: 350,
+                        child: GardenIsland(
+                          days: controller.days,
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(
-                        height: 20),
+                      const SizedBox(height: 20),
 
-                    // 🌱 WEEKLY ROW
-                    const WeeklyGardenRow(),
+                      // 🌱 WEEKLY ROW
+                      const WeeklyGardenRow(),
 
-                    const SizedBox(
-                        height: 20),
-                  ],
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
 
-      bottomNavigationBar:
-          HomeBottomNav(
+      bottomNavigationBar: HomeBottomNav(
         currentIndex: 3,
-        onTap: (index) =>
-            _handleNavTap(
-                context, index),
+        onTap: (index) => _handleNavTap(context, index),
       ),
     );
   }

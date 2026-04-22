@@ -149,10 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Color(0xFFD6F1F7),
 
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
+            backgroundColor: Color(0xFFD6F1F7),
             elevation: 0,
             actions: [
               IconButton(
@@ -318,7 +318,7 @@ class _Title extends StatelessWidget {
             fontSize: 32,
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
-            color: Colors.white,
+            color: Color(0xFF0A7DAC),
           ),
         ),
         SizedBox(height: 4),
@@ -328,7 +328,7 @@ class _Title extends StatelessWidget {
             fontSize: 32,
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
-            color: Colors.white,
+            color: Color(0xFF0A7DAC),
           ),
         ),
       ],
