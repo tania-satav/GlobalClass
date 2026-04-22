@@ -1,66 +1,109 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:keepmehydrated/features/home/today_hydration_state.dart';
+
+import '../../domain/garden_day.dart';
+import '../utils/flower_stage_utils.dart';
 
 class GardenIsland extends StatelessWidget {
-  const GardenIsland({super.key});
+  final List<GardenDay> days;
 
-String _getPlantAsset(int ml, int variant) {
-  if (ml >= 2000) {
-    switch (variant) {
-      case 0:
-        return "assets/plants/sunflower.png";
-      case 1:
-        return "assets/plants/blueflower.png";
-      case 2:
-        return "assets/plants/redflower.png";
-      case 3:
-        return "assets/plants/purpleflower.png";
-      default:
-        return "assets/plants/sunflower.png";
-    }
+  const GardenIsland({
+    super.key,
+    required this.days,
+  });
+
+  static const double islandWidth =
+      370;
+
+  static const double flowerSize =
+      45;
+
+  static const List<Offset>
+      safeSpots = [
+    Offset(185, 190),
+
+    Offset(150, 165),
+    Offset(220, 165),
+
+    Offset(120, 140),
+    Offset(185, 140),
+    Offset(250, 140),
+
+    Offset(150, 115),
+    Offset(220, 115),
+
+    Offset(185, 90),
+  ];
+
+  List<Offset> _assignPositions(
+      int count) {
+    final random =
+        Random(count * 999);
+
+    final shuffled =
+        List<Offset>.from(safeSpots)
+          ..shuffle(random);
+
+    return shuffled
+        .take(count)
+        .toList();
   }
-
-  if (ml >= 1500) return "assets/plants/growing.png";
-  if (ml >= 1000) return "assets/plants/sprout.png";
-  if (ml >= 500) return "assets/plants/bulb.png";
-  return "";
-}
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: TodayHydrationState.instance,
-      builder: (context, _) {
-        final state = TodayHydrationState.instance;
+    final positions =
+        _assignPositions(days.length);
 
-        final ml = state.currentIntakeMl;
-        final variant = state.currentFlowerVariant;
-
-        final plantAsset = _getPlantAsset(ml, variant);
-
-        return Center(
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              // 🌿 Base garden
-              Image.asset(
-                "assets/grass.png",
-                width: 370,
-              ),
-
-              // 🌱 Plant
-              if (plantAsset.isNotEmpty)
-                Positioned(
-                  bottom: 100,
-                  child: Image.asset(
-                    plantAsset,
-                    width: 50,
-                  ),
-                ),
-            ],
+    return Center(
+      child: Stack(
+        alignment:
+            Alignment.bottomCenter,
+        children: [
+          Image.asset(
+            "assets/grass.png",
+            width: islandWidth,
+            fit: BoxFit.cover,
           ),
-        );
-      },
+
+          ...List.generate(
+            days.length,
+            (index) {
+              if (index >=
+                  positions.length) {
+                return const SizedBox();
+              }
+
+              final day =
+                  days[index];
+
+              final asset =
+                  FlowerStageUtils
+                      .getPlantAsset(
+                intakeMl:
+                    day.intakeMl,
+                goalMl:
+                    day.goalMl,
+                flowerType:
+                    day.flowerType,
+              );
+
+              final center =
+                  positions[index];
+
+              return Positioned(
+                left: center.dx -
+                    flowerSize / 2,
+                bottom: center.dy -
+                    flowerSize / 2,
+                child: Image.asset(
+                  asset,
+                  width: flowerSize,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

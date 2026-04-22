@@ -16,11 +16,10 @@ class TodayHydrationState extends ChangeNotifier {
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
 
-  // 
   List<int> _flowerPool = [0, 1, 2, 3];
 
   // -------------------------------
-  // LOAD STATE
+  // LOAD TODAY DATA
   // -------------------------------
   Future<void> loadToday({required int goalMl}) async {
     final today = DateTime.now();
@@ -45,7 +44,17 @@ class TodayHydrationState extends ChangeNotifier {
   }
 
   // -------------------------------
-  // SET INTAKE (CORE LOGIC)
+  // GET RANGE DATA (USED BY GARDEN)
+  // -------------------------------
+  Future<List<Map<String, dynamic>>> getRangeData(
+    DateTime start,
+    DateTime end,
+  ) async {
+    return await _repository.getDailyRange(start, end);
+  }
+
+  // -------------------------------
+  // UPDATE INTAKE
   // -------------------------------
   Future<void> setCurrentIntake({
     required int value,
@@ -65,7 +74,7 @@ class TodayHydrationState extends ChangeNotifier {
 
     await _repository.updateLastOpenDate(today);
 
-    //
+    // unlock flower only once per goal reach
     if (previousMl < goalMl && currentIntakeMl >= goalMl) {
       _generateNextFlowerVariant();
     }
@@ -101,17 +110,13 @@ class TodayHydrationState extends ChangeNotifier {
   }
 
   // -------------------------------
-  //FLOWER ROTATION SYSTEM
+  // FLOWER VARIATION SYSTEM
   // -------------------------------
   void _generateNextFlowerVariant() {
-    // refill pool if empty
     if (_flowerPool.isEmpty) {
-      _flowerPool = [0, 1, 2]..shuffle();
+      _flowerPool = [0, 1, 2, 3]..shuffle();
     }
 
-    // take next flower from pool
     currentFlowerVariant = _flowerPool.removeLast();
-
-    notifyListeners();
   }
 }

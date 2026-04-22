@@ -113,12 +113,7 @@ class _StreaksScreenState extends State<StreaksScreen> {
   );
   return;
 }
-    /*if (index == 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Garden screen is not connected yet.')),
-      );
-      return;
-    }*/
+
     if (index == 4) {
       Navigator.pushReplacement(
         context,

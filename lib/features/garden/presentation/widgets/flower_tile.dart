@@ -1,45 +1,60 @@
 import 'package:flutter/material.dart';
+import '../../domain/plant_stage.dart';
 
 class FlowerTile extends StatelessWidget {
-  final int currentMl;
+  final double progress;
 
   const FlowerTile({
     super.key,
-    required this.currentMl,
+    required this.progress,
   });
 
-  String getPlantImage() {
-    if (currentMl >= 2000) {
-      return "assets/plants/flower.png";
+  PlantStage getStage() {
+    if (progress <= 0) {
+      return PlantStage.empty;
     }
 
-    if (currentMl >= 1500) {
-      return "assets/plants/growing.png";
+    if (progress < 0.25) {
+      return PlantStage.sprout;
     }
 
-    if (currentMl >= 1000) {
-      return "assets/plants/sprout.png";
+    if (progress < 0.75) {
+      return PlantStage.growing;
     }
 
-    if (currentMl >= 500) {
-      return "assets/plants/bulb.png";
-    }
+    return PlantStage.flower;
+  }
 
-    return "";
+  String getPlantImage(PlantStage stage) {
+    switch (stage) {
+      case PlantStage.empty:
+        return "assets/plants/bulb.png";
+
+      case PlantStage.sprout:
+        return "assets/plants/sprout.png";
+
+      case PlantStage.growing:
+        return "assets/plants/growing.png";
+
+      case PlantStage.flower:
+        return "assets/plants/sunflower.png";
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    String imagePath = getPlantImage();
+    final stage = getStage();
+    final imagePath = getPlantImage(stage);
 
-    if (imagePath.isEmpty) {
-      return const SizedBox();
-    }
-
-    return Image.asset(
-      imagePath,
-      width: 60,
-      height: 60,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+      child: Image.asset(
+        imagePath,
+        width: 65,
+        height: 65,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }
