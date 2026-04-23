@@ -501,7 +501,7 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
                             label: Text('${goal}ml'),
                             selected: isSelected,
                             onSelected: (_) => _applyQuickGoal(goal),
-                            selectedColor: const Color(0xFF2F45FF),
+                            selectedColor: const Color(0xFF0A7DAC),
                             labelStyle: TextStyle(
                               color: isSelected
                                   ? Colors.white
@@ -566,7 +566,7 @@ class _PersonalisationScreenState extends State<PersonalisationScreen> {
                   child: ElevatedButton(
                     onPressed: _savePreferences,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2F45FF),
+                      backgroundColor: const Color(0xFF0A7DAC),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),

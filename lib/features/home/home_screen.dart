@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final WaterIntakeController controller;
   final HydrationSettings settings = HydrationSettings.instance;
   final TodayHydrationState todayHydrationState = TodayHydrationState.instance;
+  final TextEditingController _customAmountController = TextEditingController();
 
   @override
   void initState() {
@@ -77,6 +78,38 @@ class _HomeScreenState extends State<HomeScreen> {
     controller.resetWater();
   }
 
+  Future<void> _addCustomWater() async {
+    final rawValue = _customAmountController.text.trim();
+    final parsedAmount = int.tryParse(rawValue);
+
+    if (parsedAmount == null || parsedAmount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a valid custom amount greater than 0 ml.'),
+        ),
+      );
+      return;
+    }
+
+    if (parsedAmount > 5000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Custom amount should be 5000 ml or less.'),
+        ),
+      );
+      return;
+    }
+
+    await _addWater(parsedAmount);
+    _customAmountController.clear();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$parsedAmount ml added to today\'s intake.')),
+    );
+  }
+
   void _handleNavTap(int index) {
     if (index == 1) return;
 
@@ -117,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     settings.removeListener(_syncGoalFromSettings);
     controller.removeListener(_syncTodayIntakeFromController);
+    _customAmountController.dispose();
     controller.dispose();
     super.dispose();
   }
@@ -133,10 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return Scaffold(
-          backgroundColor: Color(0xFFD6F1F7),
-
+          backgroundColor: const Color(0xFFD6F1F7),
           appBar: AppBar(
-            backgroundColor: Color(0xFFD6F1F7),
+            backgroundColor: const Color(0xFFD6F1F7),
             elevation: 0,
             actions: [
               IconButton(
@@ -149,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-
           body: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -157,119 +189,210 @@ class _HomeScreenState extends State<HomeScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-
             child: SafeArea(
-              child: Column(
-                children: [
-                  const SizedBox(height: 14),
-
-                  const _Title(),
-
-                  const SizedBox(height: 18),
-
-                  IntakeProgressCard(
-                    goalMl: controller.goalMl,
-                    currentMl: controller.currentMl,
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => _addWater(250),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF1D3557),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text(
-                            '+250ml',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1D3557),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => _addWater(500),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF1D3557),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text(
-                            '+500ml',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1D3557),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => _removeWater(250),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF1D3557),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text(
-                            '-250ml',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1D3557),
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: _resetWater,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0A7DAC),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: const Text(
-                            'Reset',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 14),
+                    const _Title(),
+                    const SizedBox(height: 18),
+                    IntakeProgressCard(
+                      goalMl: controller.goalMl,
+                      currentMl: controller.currentMl,
                     ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 18),
-                    child: DidYouKnowCard(),
-                  ),
-
-                  const Spacer(),
-                ],
+                    const SizedBox(height: 18),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _addWater(250),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFF1D3557),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text(
+                              '+250ml',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _addWater(500),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFF1D3557),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text(
+                              '+500ml',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _removeWater(250),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFF1D3557),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text(
+                              '-250ml',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: _resetWater,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0A7DAC),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text(
+                              'Reset',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Custom Water Intake',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1D3557),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Enter your own amount in ml and add it to today’s intake.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _customAmountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter amount',
+                                      filled: true,
+                                      fillColor: const Color(0xFFF7FBFD),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 14,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF7FBFD),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: const Text(
+                                    'ml',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF1D3557),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _addCustomWater,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF0A7DAC),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Add Custom Amount',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 18),
+                      child: DidYouKnowCard(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-
           bottomNavigationBar: HomeBottomNav(
             currentIndex: 1,
             onTap: _handleNavTap,
