@@ -97,7 +97,7 @@ class _GardenScreenState extends State<GardenScreen> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/wallpaper4.png'),
+            image: AssetImage('assets/images/wallpaper3.png'),
             fit: BoxFit.cover,
           ),
         ),

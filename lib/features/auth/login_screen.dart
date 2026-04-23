@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -15,6 +16,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   String? _error;
+
+  bool get _isAppleSignInSupported {
+    if (kIsWeb) return false;
+
+    return defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS;
+  }
 
   @override
   void dispose() {
@@ -92,6 +100,37 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithApple() async {
+    if (!_isAppleSignInSupported) {
+      setState(() {
+        _error = 'Apple Sign-In is only supported on iOS/macOS for this app.';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final appleProvider = AppleAuthProvider();
+
+      appleProvider.addScope('email');
+      appleProvider.addScope('name');
+
+      await FirebaseAuth.instance.signInWithProvider(appleProvider);
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.message ?? 'Apple sign in failed');
+      debugPrint('Apple FirebaseAuthException: ${e.code} | ${e.message}');
+    } catch (e) {
+      setState(() => _error = e.toString());
+      debugPrint('Apple sign in error: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,11 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 16,
                       offset: const Offset(0, 8),
                     ),
@@ -179,9 +218,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text('Continue with Google'),
               ),
               const SizedBox(height: 10),
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('Continue with Apple'),
+              OutlinedButton.icon(
+                onPressed: _isLoading ? null : _signInWithApple,
+                icon: const Icon(Icons.apple),
+                label: const Text('Continue with Apple'),
               ),
               const SizedBox(height: 10),
             ],

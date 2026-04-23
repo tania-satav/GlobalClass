@@ -37,6 +37,14 @@
             {
               "client_id": "380505063144-jaguk6bs6kfbutgjc5kb9b2tq0buk0mh.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "380505063144-3q1jbn72matoritv1gr3lkori0br67fi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.Plantproject",
+                "app_store_id": "173896"
+              }
             }
           ]
         }

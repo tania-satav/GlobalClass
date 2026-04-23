@@ -27,8 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final WaterIntakeController controller;
   final HydrationSettings settings = HydrationSettings.instance;
-  final TodayHydrationState todayHydrationState =
-      TodayHydrationState.instance;
+  final TodayHydrationState todayHydrationState = TodayHydrationState.instance;
 
   @override
   void initState() {
@@ -46,9 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initializeTodayState() async {
-    await todayHydrationState.loadToday(
-      goalMl: settings.dailyGoalMl,
-    );
+    await todayHydrationState.loadToday(goalMl: settings.dailyGoalMl);
 
     controller.loadState(
       goalMl: settings.dailyGoalMl,
@@ -81,39 +78,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleNavTap(int index) {
-  if (index == 1) return;
+    if (index == 1) return;
 
-  if (index == 0) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const ProfileScreen()),
-    );
-    return;
-  }
+    if (index == 0) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+      );
+      return;
+    }
 
-  if (index == 2) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const GardenScreen()),
-    );
-    return;
-  }
+    if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GardenScreen()),
+      );
+      return;
+    }
 
-  if (index == 3) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const StreaksScreen()),
-    );
-    return;
-  }
+    if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StreaksScreen()),
+      );
+      return;
+    }
 
-  if (index == 4) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const StatsScreen()),
-    );
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StatsScreen()),
+      );
+      return;
+    }
   }
-}
 
   @override
   void dispose() {
@@ -126,16 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([
-        controller,
-        todayHydrationState,
-      ]),
+      animation: Listenable.merge([controller, todayHydrationState]),
       builder: (context, _) {
         if (!todayHydrationState.isLoaded) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -149,7 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: const Icon(
                   Icons.notifications_none,
-                  color: Colors.white,
+                  color: Color(0xFF4A9FB5),
+                  size: 26,
                 ),
                 onPressed: () {},
               ),
@@ -159,9 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                  'assets/images/wallpaper4.png',
-                ),
+                image: AssetImage('assets/images/wallpaper3.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -183,9 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 18),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 10,
@@ -195,10 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () => _addWater(250),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor:
-                                const Color(0xFF1D3557),
-                            padding:
-                                const EdgeInsets.symmetric(
+                            foregroundColor: const Color(0xFF1D3557),
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 18,
                               vertical: 12,
                             ),
@@ -207,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '+250ml',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
+                              color: Color(0xFF1D3557),
                             ),
                           ),
                         ),
@@ -214,10 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () => _addWater(500),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor:
-                                const Color(0xFF1D3557),
-                            padding:
-                                const EdgeInsets.symmetric(
+                            foregroundColor: const Color(0xFF1D3557),
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 18,
                               vertical: 12,
                             ),
@@ -226,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '+500ml',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
+                              color: Color(0xFF1D3557),
                             ),
                           ),
                         ),
@@ -233,10 +221,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () => _removeWater(250),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor:
-                                const Color(0xFF1D3557),
-                            padding:
-                                const EdgeInsets.symmetric(
+                            foregroundColor: const Color(0xFF1D3557),
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 18,
                               vertical: 12,
                             ),
@@ -245,17 +231,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             '-250ml',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
+                              color: Color(0xFF1D3557),
                             ),
                           ),
                         ),
                         ElevatedButton(
                           onPressed: _resetWater,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color(0xFF0A7DAC),
+                            backgroundColor: const Color(0xFF0A7DAC),
                             foregroundColor: Colors.white,
-                            padding:
-                                const EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 18,
                               vertical: 12,
                             ),
@@ -264,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Reset',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -274,9 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 18),
 
                   const Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 18,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 18),
                     child: DidYouKnowCard(),
                   ),
 
@@ -306,20 +290,20 @@ class _Title extends StatelessWidget {
         Text(
           'YOUR DAILY',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
-            color: Color(0xFF0A7DAC),
+            color: Color(0xFF1D3557),
           ),
         ),
         SizedBox(height: 4),
         Text(
           'INTAKE',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
-            color: Color(0xFF0A7DAC),
+            color: Color(0xFF1D3557),
           ),
         ),
       ],

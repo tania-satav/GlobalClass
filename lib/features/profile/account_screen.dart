@@ -1,9 +1,40 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import '../auth/auth_gate.dart';
 import '../home/widgets/home_bottom_nav.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
+
+  Future<void> _signOut(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      // This clears the Google sign-in session if the user used Google.
+      // It is wrapped safely so email/password and Apple accounts still sign out.
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {
+        // Ignore if Google Sign-In was not initialized or not used.
+      }
+
+      await FirebaseAuth.instance.signOut();
+
+      if (!context.mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthGate()),
+        (route) => false,
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not sign out. Please try again.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +160,7 @@ class AccountScreen extends StatelessWidget {
                   icon: Icons.logout,
                   title: 'Sign Out',
                   subtitle: 'Log out of your account on this device',
-                  onTap: () async {
-                    await FirebaseAuth.instance.signOut();
-                    if (context.mounted) {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    }
-                  },
+                  onTap: () => _signOut(context),
                 ),
                 const SizedBox(height: 20),
               ],

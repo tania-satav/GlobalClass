@@ -25,13 +25,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!mounted) return;
 
     if (result != null && result.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
     }
   }
 
   void _handleNavTap(int index) {
+    // Profile is current screen
     if (index == 0) return;
 
     if (index == 1) {
@@ -42,7 +43,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    
     if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GardenScreen()),
+      );
+      return;
+    }
+
+    // ✅ FIXED: Streaks is now index 3
+    if (index == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const StreaksScreen()),
@@ -50,20 +61,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-  if (index == 3) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const StreaksScreen()),
-    );
-    return;
-  }
-
-  if (index == 4) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const StatsScreen()),
-    );
-  }
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StatsScreen()),
+      );
+      return;
+    }
   }
 
   @override
@@ -77,83 +81,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text(
           'PROFILE',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1D3557),
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
           ),
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Container(
-                width: 110,
-                height: 110,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/wallpaper3.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+
+                Container(
+                  width: 110,
+                  height: 110,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Color(0xFF1D3557),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.person,
-                  size: 60,
-                  color: Color(0xFF1D3557),
+
+                const SizedBox(height: 16),
+
+                const Text(
+                  'My Profile',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF1D3557),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'My Profile',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'Manage your account and hydration preferences',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 17,
+                    color: Color(0xFF1D3557),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Manage your account and hydration preferences',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
+
+                const SizedBox(height: 28),
+
+                _ProfileOptionCard(
+                  icon: Icons.manage_accounts_outlined,
+                  title: 'Account',
+                  subtitle: 'Login details, email, password reset and sign out',
+                  onTap: () {
+                    _openScreen(context, const AccountScreen());
+                  },
                 ),
-              ),
-              const SizedBox(height: 28),
-              _ProfileOptionCard(
-                icon: Icons.manage_accounts_outlined,
-                title: 'Account',
-                subtitle: 'Login details, email, password reset and sign out',
-                onTap: () {
-                  _openScreen(context, const AccountScreen());
-                },
-              ),
-              const SizedBox(height: 16),
-              _ProfileOptionCard(
-                icon: Icons.tune_outlined,
-                title: 'Personalisation',
-                subtitle: 'Weight, activity level, daily goal and units',
-                onTap: () {
-                  _openScreen(context, const PersonalisationScreen());
-                },
-              ),
-              const SizedBox(height: 16),
-              _ProfileOptionCard(
-                icon: Icons.notifications_active_outlined,
-                title: 'Reminders',
-                subtitle: 'Notification frequency, timing and quiet hours',
-                onTap: () {
-                  _openScreen(context, const RemindersScreen());
-                },
-              ),
-              const Spacer(),
-            ],
+
+                const SizedBox(height: 16),
+
+                _ProfileOptionCard(
+                  icon: Icons.tune_outlined,
+                  title: 'Personalisation',
+                  subtitle: 'Weight, activity level, daily goal and units',
+                  onTap: () {
+                    _openScreen(context, const PersonalisationScreen());
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                _ProfileOptionCard(
+                  icon: Icons.notifications_active_outlined,
+                  title: 'Reminders',
+                  subtitle: 'Notification frequency, timing and quiet hours',
+                  onTap: () {
+                    _openScreen(context, const RemindersScreen());
+                  },
+                ),
+
+                const Spacer(),
+              ],
+            ),
           ),
         ),
       ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: 0, onTap: _handleNavTap),
+
+      bottomNavigationBar: HomeBottomNav(
+        currentIndex: 0,
+        onTap: _handleNavTap,
+      ),
     );
   }
 }
@@ -210,10 +238,10 @@ class _ProfileOptionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         height: 1.35,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF4A9FB5),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
