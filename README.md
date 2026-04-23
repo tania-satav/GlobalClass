@@ -305,7 +305,7 @@ This project was developed collaboratively by **Team 1 – Team Tech** as part o
 - **Testing & Quality Assurance:** Maxim Horovecs  
 - **Documentation:** Tania Satavalekar  
 
-- Team 1 | Team Tech**
+- Team 1 | Team Tech
 
 ---
 
