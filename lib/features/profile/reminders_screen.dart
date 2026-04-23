@@ -133,7 +133,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     children: [
                       SwitchListTile(
                         value: _remindersEnabled,
-                        activeThumbColor: const Color(0xFF2F45FF),
+                        activeThumbColor: const Color(0xFF0A7DAC),
                         contentPadding: EdgeInsets.zero,
                         title: const Text(
                           'Enable Reminders',
@@ -267,7 +267,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                   child: ElevatedButton(
                     onPressed: _savePreferences,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2F45FF),
+                      backgroundColor: const Color(0xFF0A7DAC),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
