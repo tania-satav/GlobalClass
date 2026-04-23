@@ -4,7 +4,6 @@ import '../home/today_hydration_state.dart';
 import '../home/widgets/home_bottom_nav.dart';
 import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
-import '../streaks/streaks_screen.dart';
 import 'hydration_history_state.dart';
 import '../garden/presentation/garden_screen.dart';
 
@@ -140,15 +139,13 @@ class _StatsScreenState extends State<StatsScreen> {
       );
       return;
     }
-   if (index == 3) {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const GardenScreen(),
-    ),
-  );
-  return;
-}
+    if (index == 3) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GardenScreen()),
+      );
+      return;
+    }
     /*if (index == 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Garden screen is not connected yet.')),
@@ -253,136 +250,66 @@ class _StatsScreenState extends State<StatsScreen> {
             title: const Text(
               'STATS',
               style: TextStyle(
-                color: Colors.white,
+                color: Color(0xFF1D3557),
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1,
               ),
             ),
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Track your hydration progress over time.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  _SectionCard(
-                    title: 'Time Range',
-                    child: SegmentedButton<String>(
-                      segments: _ranges.map((range) {
-                        return ButtonSegment<String>(
-                          value: range,
-                          label: Text(range),
-                        );
-                      }).toList(),
-                      selected: {_selectedRange},
-                      onSelectionChanged: (selection) {
-                        setState(() {
-                          _selectedRange = selection.first;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Today',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.15,
-                    children: [
-                      _SummaryCard(
-                        title: 'Today’s Goal',
-                        value: '$_todayGoalMl ml',
-                        subtitle: 'Target for today',
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/wallpaper3.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Track your hydration progress over time.',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Color(0xFF1D3557),
+                        fontWeight: FontWeight.w700,
                       ),
-                      _SummaryCard(
-                        title: 'Today’s Intake',
-                        value: '$_todayIntakeMl ml',
-                        subtitle: 'What you have logged today',
-                      ),
-                      _SummaryCard(
-                        title: 'Remaining / Over',
-                        value: _remainingOrOverText,
-                        subtitle: _remainingOrOverSubtitle,
-                      ),
-                      _SummaryCard(
-                        title: 'Goal Progress',
-                        value: '$_completionPercent%',
-                        subtitle: 'Completion against today’s goal',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    title: 'Today’s Progress',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$_completionPercent% complete',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1D3557),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        LinearProgressIndicator(
-                          value: _todayGoalMl <= 0
-                              ? 0
-                              : (_todayIntakeMl / _todayGoalMl).clamp(0.0, 1.0),
-                          minHeight: 10,
-                          backgroundColor: const Color(0xFFD8EEF4),
-                          valueColor: const AlwaysStoppedAnimation(
-                            Color(0xFF2F45FF),
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          '$_todayIntakeMl ml logged out of $_todayGoalMl ml goal.',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Over Time',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                    const SizedBox(height: 18),
+                    _SectionCard(
+                      title: 'Time Range',
+                      child: SegmentedButton<String>(
+                        segments: _ranges.map((range) {
+                          return ButtonSegment<String>(
+                            value: range,
+                            label: Text(range),
+                          );
+                        }).toList(),
+                        selected: {_selectedRange},
+                        onSelectionChanged: (selection) {
+                          setState(() {
+                            _selectedRange = selection.first;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  _SectionCard(
-                    title: _rangeSummaryTitle,
-                    child: GridView.count(
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Today',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF1D3557),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -391,62 +318,151 @@ class _StatsScreenState extends State<StatsScreen> {
                       childAspectRatio: 1.15,
                       children: [
                         _SummaryCard(
-                          title: 'Days Logged',
-                          value: '$_daysLogged',
-                          subtitle: 'Days with hydration data in this range',
+                          title: 'Today’s Goal',
+                          value: '$_todayGoalMl ml',
+                          subtitle: 'Target for today',
                         ),
                         _SummaryCard(
-                          title: 'Goal Hits',
-                          value: '$_dailyGoalHits',
-                          subtitle: _dailyGoalHitsSubtitle,
+                          title: 'Today’s Intake',
+                          value: '$_todayIntakeMl ml',
+                          subtitle: 'What you have logged today',
                         ),
                         _SummaryCard(
-                          title: 'Average Intake',
-                          value: '$_averageIntakeMl ml',
-                          subtitle: 'Average intake per logged day',
+                          title: 'Remaining / Over',
+                          value: _remainingOrOverText,
+                          subtitle: _remainingOrOverSubtitle,
                         ),
                         _SummaryCard(
-                          title: 'Total Intake',
-                          value: '$_totalIntakeMl ml',
-                          subtitle: 'Total water logged in this range',
-                        ),
-                        _SummaryCard(
-                          title: 'Goal Hit Rate',
-                          value: '$_goalHitRatePercent%',
-                          subtitle: 'Percent of logged days where goal was hit',
+                          title: 'Goal Progress',
+                          value: '$_completionPercent%',
+                          subtitle: 'Completion against today’s goal',
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    title: _historySectionTitle,
-                    child: filteredEntries.isEmpty
-                        ? const Text(
-                            'No hydration history available for this range yet.',
-                            style: TextStyle(
-                              fontSize: 14,
+                    const SizedBox(height: 16),
+                    _SectionCard(
+                      title: 'Today’s Progress',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$_completionPercent% complete',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1D3557),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          LinearProgressIndicator(
+                            value: _todayGoalMl <= 0
+                                ? 0
+                                : (_todayIntakeMl / _todayGoalMl).clamp(
+                                    0.0,
+                                    1.0,
+                                  ),
+                            minHeight: 10,
+                            backgroundColor: const Color(0xFFD8EEF4),
+                            valueColor: const AlwaysStoppedAnimation(
+                              Color(0xFF2F45FF),
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '$_todayIntakeMl ml logged out of $_todayGoalMl ml goal.',
+                            style: const TextStyle(
+                              fontSize: 13,
                               color: Colors.black54,
                               fontWeight: FontWeight.w500,
                             ),
-                          )
-                        : Column(
-                            children: filteredEntries.map((entry) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _HistoryTile(
-                                  entry: _HistoryTileEntry(
-                                    label: _formatEntryLabel(entry.date),
-                                    intakeMl: entry.intakeMl,
-                                    goalMl: entry.goalMl,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
                           ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Over Time',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF1D3557),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _SectionCard(
+                      title: _rangeSummaryTitle,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.15,
+                          children: [
+                            _SummaryCard(
+                              title: 'Days Logged',
+                              value: '$_daysLogged',
+                              subtitle:
+                                  'Days with hydration data in this range',
+                            ),
+                            _SummaryCard(
+                              title: 'Goal Hits',
+                              value: '$_dailyGoalHits',
+                              subtitle: _dailyGoalHitsSubtitle,
+                            ),
+                            _SummaryCard(
+                              title: 'Average Intake',
+                              value: '$_averageIntakeMl ml',
+                              subtitle: 'Average intake per logged day',
+                            ),
+                            _SummaryCard(
+                              title: 'Total Intake',
+                              value: '$_totalIntakeMl ml',
+                              subtitle: 'Total water logged in this range',
+                            ),
+                            _SummaryCard(
+                              title: 'Goal Hit Rate',
+                              value: '$_goalHitRatePercent%',
+                              subtitle:
+                                  'Percent of logged days where goal was hit',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionCard(
+                      title: _historySectionTitle,
+                      child: filteredEntries.isEmpty
+                          ? const Text(
+                              'No hydration history available for this range yet.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          : Column(
+                              children: filteredEntries.map((entry) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _HistoryTile(
+                                    entry: _HistoryTileEntry(
+                                      label: _formatEntryLabel(entry.date),
+                                      intakeMl: entry.intakeMl,
+                                      goalMl: entry.goalMl,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),
@@ -481,12 +497,13 @@ class _SummaryCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             title,
             style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w900,
               color: Color(0xFF1D3557),
             ),
           ),
@@ -502,11 +519,13 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 12,
-              height: 1.35,
-              color: Colors.black54,
-              fontWeight: FontWeight.w500,
+              fontSize: 13,
+              height: 1.2,
+              color: Color(0xFF8ED0E0),
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -537,7 +556,7 @@ class _SectionCard extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w900,
               color: Color(0xFF1D3557),
             ),
           ),
