@@ -29,22 +29,30 @@ class WeeklyDayTile extends StatelessWidget {
       isFuture: isFuture,
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          asset,
-          width: 40,
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+return SizedBox(
+  height: 70, // ensures all tiles share the same height
+  child: Column(
+    children: [
+      Expanded(
+        child: Center(
+          child: Image.asset(
+            asset,
+            width: 40,
           ),
         ),
-      ],
-    );
+      ),
+
+      const SizedBox(height: 6),
+
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ],
+  ),
+);
   }
 }

@@ -76,16 +76,17 @@ class GardenIsland extends StatelessWidget {
               final day =
                   days[index];
 
-              final asset =
-                  FlowerStageUtils
-                      .getPlantAsset(
-                intakeMl:
-                    day.intakeMl,
-                goalMl:
-                    day.goalMl,
-                flowerType:
-                    day.flowerType,
-              );
+              // If no water logged, show nothing
+if (day.intakeMl == 0) {
+  return const SizedBox.shrink();
+}
+
+final asset =
+    FlowerStageUtils.getPlantAsset(
+  intakeMl: day.intakeMl,
+  goalMl: day.goalMl,
+  flowerType: day.flowerType,
+);
 
               final center =
                   positions[index];

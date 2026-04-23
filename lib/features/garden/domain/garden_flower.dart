@@ -1,6 +1,6 @@
 import 'plant_stage.dart';
 
-/// 🌿 Plant stage → image mapping (keep as-is)
+
 String getPlantImage(PlantStage stage) {
   switch (stage) {
     case PlantStage.empty:
@@ -17,7 +17,7 @@ String getPlantImage(PlantStage stage) {
   }
 }
 
-/// 🌸 FLOWER TYPE (NEW FIX)
+
 enum FlowerType {
   sunflower,
   blueflower,
@@ -25,13 +25,13 @@ enum FlowerType {
   purpleflower,
 }
 
-/// 🌿 MAIN MODEL
+
 class GardenFlower {
   final String id;
   final DateTime createdAt;
   final int waterAmount;
 
-  /// 🌸 NEW: stores which flower was generated
+  ///stores which flower was generated
   final FlowerType flowerType;
 
   GardenFlower({
@@ -41,7 +41,7 @@ class GardenFlower {
     required this.flowerType,
   });
 
-  /// 🌼 helper: convert type → asset
+  ///helper: convert type → asset
   String get image {
     switch (flowerType) {
       case FlowerType.sunflower:

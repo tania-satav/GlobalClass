@@ -43,7 +43,7 @@ class _GardenScreenState extends State<GardenScreen> {
   }
 
   void _handleNavTap(BuildContext context, int index) {
-    if (index == 3) return;
+    if (index == 2) return; // Garden (current screen)
 
     if (index == 0) {
       Navigator.pushReplacement(
@@ -61,7 +61,7 @@ class _GardenScreenState extends State<GardenScreen> {
       return;
     }
 
-    if (index == 2) {
+    if (index == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const StreaksScreen()),
@@ -89,12 +89,11 @@ class _GardenScreenState extends State<GardenScreen> {
       backgroundColor: const Color(0xFFD6F1F7),
 
       appBar: AppBar(
-        backgroundColor: Color(0xFFD6F1F7),
+        backgroundColor: const Color(0xFFD6F1F7),
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
 
-      // 🌿 BACKGROUND IMAGE WRAPPER
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -107,32 +106,63 @@ class _GardenScreenState extends State<GardenScreen> {
           child: Column(
             children: [
               const GardenHeader(),
+
               const SizedBox(height: 10),
+
               const GrowableFlowersBar(),
-              const SizedBox(height: 20),
 
+              const SizedBox(height: 16),
+
+              // Main content area (no scrolling)
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
 
-                      // 🌿 ISLAND
-                      SizedBox(
-                        height: 350,
-                        child: GardenIsland(
-                          days: controller.days,
+                    // Garden Island fills remaining space
+                    Expanded(
+                      child: GardenIsland(
+                        days: controller.days,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Weekly Progress Card
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 18,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Weekly Progress',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0A7DAC),
+                              ),
+                            ),
+
+                            SizedBox(height: 12),
+
+                            WeeklyGardenRow(),
+                          ],
                         ),
                       ),
+                    ),
 
-                      const SizedBox(height: 20),
-
-                      // 🌱 WEEKLY ROW
-                      const WeeklyGardenRow(),
-
-                      const SizedBox(height: 20),
-                    ],
-                  ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             ],
@@ -141,7 +171,7 @@ class _GardenScreenState extends State<GardenScreen> {
       ),
 
       bottomNavigationBar: HomeBottomNav(
-        currentIndex: 3,
+        currentIndex: 2,
         onTap: (index) => _handleNavTap(context, index),
       ),
     );

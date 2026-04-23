@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../home/today_hydration_state.dart';
 import '../home/widgets/home_bottom_nav.dart';
+import '../streaks/streaks_screen.dart';
 import '../profile/hydration_settings.dart';
 import '../profile/profile_screen.dart';
 import 'hydration_history_state.dart';
@@ -127,7 +128,7 @@ class _StatsScreenState extends State<StatsScreen> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        MaterialPageRoute(builder: (_) => const ProfileScreen()),
       );
       return;
     }
@@ -135,27 +136,23 @@ class _StatsScreenState extends State<StatsScreen> {
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
       return;
     }
+
+    if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const GardenScreen()),
+      );
+      return;
+    }
+
     if (index == 3) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const GardenScreen()),
-      );
-      return;
-    }
-    /*if (index == 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Garden screen is not connected yet.')),
-      );
-      return;
-    }*/
-
-    if (index == 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Garden screen is not connected yet.')),
+        MaterialPageRoute(builder: (_) => const StreaksScreen()),
       );
       return;
     }

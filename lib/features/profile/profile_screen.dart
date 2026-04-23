@@ -25,13 +25,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!mounted) return;
 
     if (result != null && result.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
     }
   }
 
   void _handleNavTap(int index) {
+    // Profile is current screen
     if (index == 0) return;
 
     if (index == 1) {
@@ -42,7 +43,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    
     if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GardenScreen()),
+      );
+      return;
+    }
+
+    // ✅ FIXED: Streaks is now index 3
+    if (index == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const StreaksScreen()),
@@ -50,22 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const GardenScreen()),
-      );
-      return;
-    }
-    /*if (index == 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Garden screen is not connected yet.')),
-      );
-      return;
-    }*/
-
     if (index == 4) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const StatsScreen()),
       );
@@ -103,6 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 8),
+
                 Container(
                   width: 110,
                   height: 110,
@@ -116,7 +114,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Color(0xFF1D3557),
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
                 const Text(
                   'My Profile',
                   style: TextStyle(
@@ -125,7 +125,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Color(0xFF1D3557),
                   ),
                 ),
+
                 const SizedBox(height: 10),
+
                 const Text(
                   'Manage your account and hydration preferences',
                   textAlign: TextAlign.center,
@@ -135,7 +137,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+
                 const SizedBox(height: 28),
+
                 _ProfileOptionCard(
                   icon: Icons.manage_accounts_outlined,
                   title: 'Account',
@@ -144,7 +148,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _openScreen(context, const AccountScreen());
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 _ProfileOptionCard(
                   icon: Icons.tune_outlined,
                   title: 'Personalisation',
@@ -153,7 +159,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _openScreen(context, const PersonalisationScreen());
                   },
                 ),
+
                 const SizedBox(height: 16),
+
                 _ProfileOptionCard(
                   icon: Icons.notifications_active_outlined,
                   title: 'Reminders',
@@ -162,13 +170,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _openScreen(context, const RemindersScreen());
                   },
                 ),
+
                 const Spacer(),
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: 0, onTap: _handleNavTap),
+
+      bottomNavigationBar: HomeBottomNav(
+        currentIndex: 0,
+        onTap: _handleNavTap,
+      ),
     );
   }
 }

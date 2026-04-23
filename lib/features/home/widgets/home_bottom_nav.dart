@@ -32,15 +32,16 @@ class HomeBottomNav extends StatelessWidget {
           activeIcon: Icon(Icons.home),
           label: 'Home',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.local_fire_department_outlined),
-          activeIcon: Icon(Icons.local_fire_department),
-          label: 'Streaks',
-        ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.yard_outlined),
           activeIcon: Icon(Icons.yard),
           label: 'Garden',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.local_fire_department_outlined),
+          activeIcon: Icon(Icons.local_fire_department),
+          label: 'Streaks',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.bar_chart_outlined),
