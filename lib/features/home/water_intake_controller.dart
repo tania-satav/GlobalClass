@@ -39,4 +39,5 @@ class WaterIntakeController extends ChangeNotifier {
     goalMl = newGoalMl;
     notifyListeners();
   }
+  
 }

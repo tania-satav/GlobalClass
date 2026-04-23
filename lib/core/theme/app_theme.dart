@@ -4,7 +4,13 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+
+      //THIS LINE MAKES ALL TEXT QUICKSAND
+      fontFamily: 'Quicksand',
+
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF0A7DAC),
+      ),
     );
   }
 }

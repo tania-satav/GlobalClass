@@ -7,15 +7,34 @@ import 'features/profile/hydration_settings.dart';
 import 'features/profile/hydration_settings_storage.dart';
 import 'firebase_options.dart';
 
+import 'package:provider/provider.dart';
+import 'features/home/water_intake_controller.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  MaterialApp(
+  theme: ThemeData(
+    fontFamily: 'Quicksand',
+  ),
+);
 
   await _initializeFirebaseIfSupported();
 
   final savedGoal = await HydrationSettingsStorage.loadDailyGoalMl();
   HydrationSettings.instance.dailyGoalMl = savedGoal;
 
-  runApp(const PlantApp());
+  
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => WaterIntakeController(
+        goalMl: savedGoal,
+        currentMl: 0,
+      ),
+      child: const PlantApp(),
+    ),
+  );
 }
 
 Future<void> _initializeFirebaseIfSupported() async {

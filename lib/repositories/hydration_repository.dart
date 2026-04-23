@@ -6,10 +6,14 @@ import '../features/stats/hydration_history_state.dart';
 class HydrationRepository {
   HydrationRepository._internal();
 
-  static final HydrationRepository instance = HydrationRepository._internal();
+  static final HydrationRepository instance =
+      HydrationRepository._internal();
 
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
+  // -------------------------------
+  // DATE HELPERS
+  // -------------------------------
   String dateOnly(DateTime date) {
     final year = date.year.toString().padLeft(4, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -21,6 +25,9 @@ class HydrationRepository {
     return DateTime(date.year, date.month, date.day);
   }
 
+  // -------------------------------
+  // SETTINGS
+  // -------------------------------
   Future<Map<String, dynamic>?> getSettingsRow() async {
     return _databaseHelper.getSettings();
   }
@@ -36,8 +43,7 @@ class HydrationRepository {
 
     settings.loadPersonalisation(
       weightKg: (settingsRow?['weight_kg'] as num?)?.toDouble() ?? 70.0,
-      activityLevel:
-          (settingsRow?['activity_level'] as String?) ?? 'Medium',
+      activityLevel: (settingsRow?['activity_level'] as String?) ?? 'Medium',
       unit: (settingsRow?['unit'] as String?) ?? 'ml',
       dailyGoalMl: (settingsRow?['daily_goal_ml'] as int?) ?? 2100,
     );
@@ -46,85 +52,88 @@ class HydrationRepository {
   }
 
   Future<void> saveHydrationSettings(HydrationSettings settings) async {
-    final currentSettings = await _databaseHelper.getSettings();
+    final current = await _databaseHelper.getSettings();
 
     await _databaseHelper.upsertSettings(
       weightKg: settings.weightKg,
       activityLevel: settings.activityLevel,
       unit: settings.unit,
       dailyGoalMl: settings.dailyGoalMl,
-      lastOpenDate: currentSettings?['last_open_date'] as String?,
-      remindersEnabled: (currentSettings?['reminders_enabled'] as int?) ?? 1,
+      lastOpenDate: current?['last_open_date'] as String?,
+      remindersEnabled: (current?['reminders_enabled'] as int?) ?? 1,
       reminderFrequencyHours:
-          (currentSettings?['reminder_frequency_hours'] as int?) ?? 2,
+          (current?['reminder_frequency_hours'] as int?) ?? 2,
       reminderStartTime:
-          (currentSettings?['reminder_start_time'] as String?) ?? '09:00',
+          (current?['reminder_start_time'] as String?) ?? '09:00',
       reminderEndTime:
-          (currentSettings?['reminder_end_time'] as String?) ?? '22:00',
+          (current?['reminder_end_time'] as String?) ?? '22:00',
       quietStartTime:
-          (currentSettings?['quiet_start_time'] as String?) ?? '23:00',
+          (current?['quiet_start_time'] as String?) ?? '23:00',
       quietEndTime:
-          (currentSettings?['quiet_end_time'] as String?) ?? '07:00',
+          (current?['quiet_end_time'] as String?) ?? '07:00',
     );
   }
 
   Future<void> saveDailyGoalMl(int value) async {
-    final currentSettings = await _databaseHelper.getSettings();
+    final current = await _databaseHelper.getSettings();
 
     await _databaseHelper.upsertSettings(
-      weightKg: (currentSettings?['weight_kg'] as num?)?.toDouble() ?? 70.0,
-      activityLevel:
-          (currentSettings?['activity_level'] as String?) ?? 'Medium',
-      unit: (currentSettings?['unit'] as String?) ?? 'ml',
+      weightKg: (current?['weight_kg'] as num?)?.toDouble() ?? 70.0,
+      activityLevel: (current?['activity_level'] as String?) ?? 'Medium',
+      unit: (current?['unit'] as String?) ?? 'ml',
       dailyGoalMl: value,
-      lastOpenDate: currentSettings?['last_open_date'] as String?,
-      remindersEnabled: (currentSettings?['reminders_enabled'] as int?) ?? 1,
+      lastOpenDate: current?['last_open_date'] as String?,
+      remindersEnabled: (current?['reminders_enabled'] as int?) ?? 1,
       reminderFrequencyHours:
-          (currentSettings?['reminder_frequency_hours'] as int?) ?? 2,
+          (current?['reminder_frequency_hours'] as int?) ?? 2,
       reminderStartTime:
-          (currentSettings?['reminder_start_time'] as String?) ?? '09:00',
+          (current?['reminder_start_time'] as String?) ?? '09:00',
       reminderEndTime:
-          (currentSettings?['reminder_end_time'] as String?) ?? '22:00',
+          (current?['reminder_end_time'] as String?) ?? '22:00',
       quietStartTime:
-          (currentSettings?['quiet_start_time'] as String?) ?? '23:00',
+          (current?['quiet_start_time'] as String?) ?? '23:00',
       quietEndTime:
-          (currentSettings?['quiet_end_time'] as String?) ?? '07:00',
+          (current?['quiet_end_time'] as String?) ?? '07:00',
     );
   }
 
+  // -------------------------------
+  // REMINDERS
+  // -------------------------------
   Future<ReminderSettings> loadReminderSettings() async {
-    final settingsRow = await _databaseHelper.getSettings();
+    final row = await _databaseHelper.getSettings();
 
     return ReminderSettings(
-      remindersEnabled: ((settingsRow?['reminders_enabled'] as int?) ?? 1) == 1,
-      frequencyHours:
-          (settingsRow?['reminder_frequency_hours'] as int?) ?? 2,
-      startTime: (settingsRow?['reminder_start_time'] as String?) ?? '09:00',
-      endTime: (settingsRow?['reminder_end_time'] as String?) ?? '22:00',
-      quietStart: (settingsRow?['quiet_start_time'] as String?) ?? '23:00',
-      quietEnd: (settingsRow?['quiet_end_time'] as String?) ?? '07:00',
+      remindersEnabled: ((row?['reminders_enabled'] as int?) ?? 1) == 1,
+      frequencyHours: (row?['reminder_frequency_hours'] as int?) ?? 2,
+      startTime: (row?['reminder_start_time'] as String?) ?? '09:00',
+      endTime: (row?['reminder_end_time'] as String?) ?? '22:00',
+      quietStart: (row?['quiet_start_time'] as String?) ?? '23:00',
+      quietEnd: (row?['quiet_end_time'] as String?) ?? '07:00',
     );
   }
 
-  Future<void> saveReminderSettings(ReminderSettings reminderSettings) async {
-    final currentSettings = await _databaseHelper.getSettings();
+  Future<void> saveReminderSettings(ReminderSettings settings) async {
+    final current = await _databaseHelper.getSettings();
 
     await _databaseHelper.upsertSettings(
-      weightKg: (currentSettings?['weight_kg'] as num?)?.toDouble() ?? 70.0,
-      activityLevel:
-          (currentSettings?['activity_level'] as String?) ?? 'Medium',
-      unit: (currentSettings?['unit'] as String?) ?? 'ml',
-      dailyGoalMl: (currentSettings?['daily_goal_ml'] as int?) ?? 2100,
-      lastOpenDate: currentSettings?['last_open_date'] as String?,
-      remindersEnabled: reminderSettings.remindersEnabled ? 1 : 0,
-      reminderFrequencyHours: reminderSettings.frequencyHours,
-      reminderStartTime: reminderSettings.startTime,
-      reminderEndTime: reminderSettings.endTime,
-      quietStartTime: reminderSettings.quietStart,
-      quietEndTime: reminderSettings.quietEnd,
+      weightKg: (current?['weight_kg'] as num?)?.toDouble() ?? 70.0,
+      activityLevel: (current?['activity_level'] as String?) ?? 'Medium',
+      unit: (current?['unit'] as String?) ?? 'ml',
+      dailyGoalMl: (current?['daily_goal_ml'] as int?) ?? 2100,
+      lastOpenDate: current?['last_open_date'] as String?,
+      remindersEnabled: settings.remindersEnabled ? 1 : 0,
+      reminderFrequencyHours: settings.frequencyHours,
+      reminderStartTime: settings.startTime,
+      reminderEndTime: settings.endTime,
+      quietStartTime: settings.quietStart,
+      quietEndTime: settings.quietEnd,
     );
   }
 
+  // -------------------------------
+  // DAILY DATA
+  // -------------------------------
   Future<void> ensureTodayRow({
     required DateTime date,
     required int goalMl,
@@ -161,6 +170,22 @@ class HydrationRepository {
     );
   }
 
+  // -------------------------------
+  // 🔥 GARDEN FEATURE (FIXED)
+  // -------------------------------
+  Future<List<Map<String, dynamic>>> getDailyRange(
+    DateTime start,
+    DateTime end,
+  ) async {
+    return _databaseHelper.getDailyIntakeRange(
+      startDate: dateOnly(start),
+      endDate: dateOnly(end),
+    );
+  }
+
+  // -------------------------------
+  // HISTORY
+  // -------------------------------
   Future<List<HydrationHistoryEntry>> loadHistoryEntries() async {
     final rows = await _databaseHelper.getDailyIntakeRange(
       startDate: '2000-01-01',
@@ -176,6 +201,9 @@ class HydrationRepository {
     }).toList();
   }
 
+  // -------------------------------
+  // LAST OPEN DATE
+  // -------------------------------
   Future<String?> getLastOpenDate() async {
     final settings = await _databaseHelper.getSettings();
     return settings?['last_open_date'] as String?;
