@@ -81,48 +81,39 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleNavTap(int index) {
-    if (index == 1) return;
+  if (index == 1) return;
 
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const GardenScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const StreaksScreen(),
-        ),
-      );
-      return;
-    }
-
-    if (index == 4) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const StatsScreen(),
-        ),
-      );
-      return;
-    }
+  if (index == 0) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+    );
+    return;
   }
+
+  if (index == 2) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const GardenScreen()),
+    );
+    return;
+  }
+
+  if (index == 3) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const StreaksScreen()),
+    );
+    return;
+  }
+
+  if (index == 4) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const StatsScreen()),
+    );
+  }
+}
 
   @override
   void dispose() {
@@ -169,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                  'assets/images/wallpaper3.png',
+                  'assets/images/wallpaper4.png',
                 ),
                 fit: BoxFit.cover,
               ),
